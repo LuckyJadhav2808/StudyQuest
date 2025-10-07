@@ -1220,6 +1220,48 @@
             flex-wrap: wrap;
         }
 
+        /* Notes View Mode */
+        .notes-view-mode {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .view-mode-btn {
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+            color: var(--text-light);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        .light-theme .view-mode-btn {
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .view-mode-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .notes-readonly {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 300px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .light-theme .notes-readonly {
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
         /* Responsive Styles */
         @media (max-width: 1024px) {
             .sidebar {
@@ -1692,10 +1734,19 @@
                             </h2>
                         </div>
                         <div class="widget-content">
+                            <div class="notes-view-mode">
+                                <button class="view-mode-btn active" id="edit-mode-btn">
+                                    <i class="fas fa-edit"></i> Edit Mode
+                                </button>
+                                <button class="view-mode-btn" id="view-mode-btn">
+                                    <i class="fas fa-eye"></i> View Mode
+                                </button>
+                            </div>
                             <div class="form-group">
                                 <input type="text" class="form-control" id="note-title" placeholder="Note Title">
                             </div>
                             <div id="editor"></div>
+                            <div id="notes-readonly" class="notes-readonly" style="display: none;"></div>
                             <div class="form-group" style="display: flex; gap: 10px; flex-wrap: wrap;">
                                 <button class="btn btn-primary" id="save-note-btn">
                                     <i class="fas fa-save"></i> Save Note
@@ -1933,6 +1984,9 @@
                             <div class="backup-actions">
                                 <button class="btn btn-primary" id="backup-data-btn">
                                     <i class="fas fa-file-export"></i> Export Backup
+                                </button>
+                                <button class="btn btn-secondary" id="copy-data-btn">
+                                    <i class="fas fa-copy"></i> Copy Data
                                 </button>
                             </div>
                         </div>
@@ -2304,7 +2358,8 @@
             theme: "dark",
             lastActivityDate: null,
             studyPredictions: {},
-            surpriseRewards: []
+            surpriseRewards: [],
+            notesViewMode: "edit" // 'edit' or 'view'
         };
 
         // DOM Elements
@@ -2379,6 +2434,10 @@
         const sessionName2 = document.getElementById('session-name-2');
         const sessionName3 = document.getElementById('session-name-3');
         const deleteEventBtn = document.getElementById('delete-event-btn');
+        const editModeBtn = document.getElementById('edit-mode-btn');
+        const viewModeBtn = document.getElementById('view-mode-btn');
+        const notesReadonly = document.getElementById('notes-readonly');
+        const copyDataBtn = document.getElementById('copy-data-btn');
 
         // Quill Editor
         const quill = new Quill('#editor', {
@@ -2461,6 +2520,11 @@
                     sessionName1.value = state.sessionNames[0];
                     sessionName2.value = state.sessionNames[1];
                     sessionName3.value = state.sessionNames[2];
+                }
+                
+                // Update notes view mode
+                if (state.notesViewMode) {
+                    setNotesViewMode(state.notesViewMode);
                 }
             }
         }
@@ -2617,6 +2681,15 @@
             exportNoteBtn.addEventListener('click', exportNoteAsPDF);
             deleteNoteBtn.addEventListener('click', deleteNote);
 
+            // Notes view mode buttons
+            editModeBtn.addEventListener('click', () => {
+                setNotesViewMode('edit');
+            });
+            
+            viewModeBtn.addEventListener('click', () => {
+                setNotesViewMode('view');
+            });
+
             // Calendar navigation
             prevMonthBtn.addEventListener('click', () => {
                 currentMonth--;
@@ -2645,6 +2718,7 @@
             // Backup and Restore
             backupDataBtn.addEventListener('click', backupData);
             restoreDataBtn.addEventListener('click', restoreData);
+            copyDataBtn.addEventListener('click', copyDataToClipboard);
 
             // Settings
             saveProfileBtn.addEventListener('click', saveProfile);
@@ -2935,12 +3009,23 @@
             saveState();
             renderNotes();
             showToast('Note saved successfully!');
+            
+            // Update read-only view if in view mode
+            if (state.notesViewMode === 'view') {
+                updateNotesReadonlyView();
+            }
         }
 
         function newNote() {
             state.currentNoteId = null;
             noteTitle.value = '';
             quill.root.innerHTML = '';
+            notesReadonly.innerHTML = '';
+            
+            // Update active note in list
+            document.querySelectorAll('.note-item').forEach(item => {
+                item.classList.remove('active');
+            });
         }
 
         function exportNoteAsPDF() {
@@ -3031,6 +3116,42 @@
                 renderNotes();
                 newNote();
                 showToast('Note deleted successfully!');
+            }
+        }
+
+        // Notes view mode functions
+        function setNotesViewMode(mode) {
+            state.notesViewMode = mode;
+            saveState();
+            
+            if (mode === 'edit') {
+                editModeBtn.classList.add('active');
+                viewModeBtn.classList.remove('active');
+                document.getElementById('editor').style.display = 'block';
+                notesReadonly.style.display = 'none';
+                noteTitle.disabled = false;
+                saveNoteBtn.disabled = false;
+            } else {
+                editModeBtn.classList.remove('active');
+                viewModeBtn.classList.add('active');
+                document.getElementById('editor').style.display = 'none';
+                notesReadonly.style.display = 'block';
+                noteTitle.disabled = true;
+                saveNoteBtn.disabled = true;
+                
+                // Update the read-only view
+                updateNotesReadonlyView();
+            }
+        }
+
+        function updateNotesReadonlyView() {
+            if (state.currentNoteId) {
+                const note = state.notes.find(n => n.id === state.currentNoteId);
+                if (note) {
+                    notesReadonly.innerHTML = note.content;
+                }
+            } else {
+                notesReadonly.innerHTML = '<p class="empty-state">No note selected. Create or select a note to view.</p>';
             }
         }
 
@@ -3178,6 +3299,48 @@
             URL.revokeObjectURL(url);
             
             showToast('Backup created successfully!');
+        }
+
+        function copyDataToClipboard() {
+            const dataStr = JSON.stringify(state, null, 2);
+            
+            // Use the Clipboard API if available
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(dataStr)
+                    .then(() => {
+                        showToast('Data copied to clipboard!');
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy data: ', err);
+                        fallbackCopyToClipboard(dataStr);
+                    });
+            } else {
+                fallbackCopyToClipboard(dataStr);
+            }
+        }
+
+        function fallbackCopyToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast('Data copied to clipboard!');
+                } else {
+                    showToast('Failed to copy data to clipboard', 'error');
+                }
+            } catch (err) {
+                console.error('Fallback copy failed: ', err);
+                showToast('Failed to copy data to clipboard', 'error');
+            }
+            
+            document.body.removeChild(textArea);
         }
 
         function restoreData() {
@@ -3479,159 +3642,122 @@
             updateTaskSubjectSelect();
         }
 
-        function renderTasks() {
-            // Clear task lists
-            taskList.innerHTML = '';
-            dashboardTasks.innerHTML = '';
-            
-            if (state.tasks.length === 0) {
-                taskList.innerHTML = '<li class="empty-state">No tasks yet. Add your first task to get started!</li>';
-                dashboardTasks.innerHTML = '<li class="empty-state">No upcoming tasks. Add a task to get started!</li>';
-                return;
-            }
-            
-            // Sort tasks: incomplete first, then by due date
-            const sortedTasks = [...state.tasks].sort((a, b) => {
-                if (a.completed !== b.completed) {
-                    return a.completed ? 1 : -1;
-                }
-                return new Date(a.due) - new Date(b.due);
-            });
-            
-            // Render tasks in task manager
-            sortedTasks.forEach(task => {
-                const taskItem = document.createElement('li');
-                taskItem.className = 'task-item';
-                if (task.completed) taskItem.style.opacity = '0.7';
-                
-                const dueDate = new Date(task.due);
-                const formattedDate = dueDate.toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    day: 'numeric' 
-                });
-                
-                taskItem.innerHTML = `
-                    <div class="task-checkbox ${task.completed ? 'checked' : ''}" data-task-id="${task.id}">
-                        ${task.completed ? '<i class="fas fa-check"></i>' : ''}
-                    </div>
-                    <div class="task-info">
-                        <div class="task-title">${task.title}</div>
-                        <div class="task-due">Due: ${formattedDate}</div>
-                        ${task.description ? `<div class="task-desc">${task.description}</div>` : ''}
-                    </div>
-                    <div class="task-actions">
-                        <button class="task-btn edit-task" data-task-id="${task.id}" ${task.completed ? 'disabled' : ''}>
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="task-btn delete-task" data-task-id="${task.id}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `;
-                
-                taskList.appendChild(taskItem);
-            });
-            
-            // Render upcoming tasks in dashboard (only incomplete, max 3)
-            const upcomingTasks = sortedTasks
-                .filter(task => !task.completed)
-                .slice(0, 3);
-                
-            if (upcomingTasks.length === 0) {
-                dashboardTasks.innerHTML = '<li class="empty-state">No upcoming tasks. Add a task to get started!</li>';
-                return;
-            }
-                
-            upcomingTasks.forEach(task => {
-                const taskItem = document.createElement('li');
-                taskItem.className = 'task-item';
-                
-                const dueDate = new Date(task.due);
-                const formattedDate = dueDate.toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    day: 'numeric' 
-                });
-                
-                taskItem.innerHTML = `
-                    <div class="task-checkbox" data-task-id="${task.id}">
-                    </div>
-                    <div class="task-info">
-                        <div class="task-title">${task.title}</div>
-                        <div class="task-due">Due: ${formattedDate}</div>
-                    </div>
-                `;
-                
-                dashboardTasks.appendChild(taskItem);
-            });
-            
-            // Add event listeners to task checkboxes
-            document.querySelectorAll('.task-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('click', (e) => {
-                    const taskId = checkbox.getAttribute('data-task-id');
-                    toggleTaskCompletion(taskId);
-                });
-            });
-            
-            // Add event listeners to edit and delete buttons
-            document.querySelectorAll('.edit-task').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const taskId = btn.getAttribute('data-task-id');
-                    editTask(taskId);
-                });
-            });
-            
-            document.querySelectorAll('.delete-task').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const taskId = btn.getAttribute('data-task-id');
-                    deleteTask(taskId);
-                });
-            });
+       function renderTasks() {
+    // Clear task lists
+    taskList.innerHTML = '';
+    dashboardTasks.innerHTML = '';
+    
+    if (state.tasks.length === 0) {
+        taskList.innerHTML = '<li class="empty-state">No tasks yet. Add your first task to get started!</li>';
+        dashboardTasks.innerHTML = '<li class="empty-state">No upcoming tasks. Add a task to get started!</li>';
+        return;
+    }
+    
+    // Sort tasks: incomplete first, then by due date
+    const sortedTasks = [...state.tasks].sort((a, b) => {
+        if (a.completed !== b.completed) {
+            return a.completed ? 1 : -1;
         }
-
-        function renderNotes() {
-            notesList.innerHTML = '';
-            
-            if (state.notes.length === 0) {
-                notesList.innerHTML = '<div class="empty-state">No notes yet. Create your first note!</div>';
-                return;
+        return new Date(a.due) - new Date(b.due);
+    });
+    
+    // Render tasks in task manager
+    sortedTasks.forEach(task => {
+        const taskItem = document.createElement('li');
+        taskItem.className = 'task-item';
+        if (task.completed) taskItem.style.opacity = '0.7';
+        
+        const dueDate = new Date(task.due);
+        const formattedDate = dueDate.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric' 
+        });
+        
+        taskItem.innerHTML = `
+            <div class="task-checkbox ${task.completed ? 'checked' : ''}" data-task-id="${task.id}">
+                ${task.completed ? '<i class="fas fa-check"></i>' : ''}
+            </div>
+            <div class="task-info">
+                <div class="task-title">${task.title}</div>
+                <div class="task-due">Due: ${formattedDate}</div>
+                ${task.description ? `<div class="task-desc">${task.description}</div>` : ''}
+            </div>
+            <div class="task-actions">
+                <button class="task-btn edit-task" data-task-id="${task.id}">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="task-btn delete-task" data-task-id="${task.id}">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+        
+        taskList.appendChild(taskItem);
+    });
+    
+    // Render upcoming tasks in dashboard (only incomplete, max 3)
+    const upcomingTasks = sortedTasks
+        .filter(task => !task.completed)
+        .slice(0, 3);
+        
+    if (upcomingTasks.length === 0) {
+        dashboardTasks.innerHTML = '<li class="empty-state">No upcoming tasks. Add a task to get started!</li>';
+        return;
+    }
+        
+    upcomingTasks.forEach(task => {
+        const taskItem = document.createElement('li');
+        taskItem.className = 'task-item';
+        
+        const dueDate = new Date(task.due);
+        const formattedDate = dueDate.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric' 
+        });
+        
+        taskItem.innerHTML = `
+            <div class="task-checkbox" data-task-id="${task.id}">
+            </div>
+            <div class="task-info">
+                <div class="task-title">${task.title}</div>
+                <div class="task-due">Due: ${formattedDate}</div>
+            </div>
+        `;
+        
+        dashboardTasks.appendChild(taskItem);
+    });
+    
+    // Add event listeners to task checkboxes
+    document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('click', (e) => {
+            const taskId = checkbox.getAttribute('data-task-id');
+            toggleTaskCompletion(taskId);
+        });
+    });
+    
+    // Add event listeners to edit and delete buttons - FIXED VERSION
+    document.querySelectorAll('.edit-task').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const taskId = btn.getAttribute('data-task-id');
+            editTask(taskId);
+        });
+    });
+    
+    document.querySelectorAll('.delete-task').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const taskId = btn.getAttribute('data-task-id');
+            // Remove the task directly without checking completion status
+            if (confirm('Are you sure you want to delete this task?')) {
+                state.tasks = state.tasks.filter(t => t.id !== taskId);
+                saveState();
+                renderTasks();
+                showToast('Task deleted successfully!');
             }
-            
-            // Sort notes by updated date (newest first)
-            const sortedNotes = [...state.notes].sort((a, b) => 
-                new Date(b.updatedAt) - new Date(a.updatedAt)
-            );
-            
-            sortedNotes.forEach(note => {
-                const noteItem = document.createElement('div');
-                noteItem.className = `note-item ${state.currentNoteId === note.id ? 'active' : ''}`;
-                noteItem.setAttribute('data-note-id', note.id);
-                
-                const updatedDate = new Date(note.updatedAt);
-                const formattedDate = updatedDate.toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    day: 'numeric' 
-                });
-                
-                // Create plain text preview (remove HTML tags)
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = note.content;
-                const textPreview = tempDiv.textContent || tempDiv.innerText || '';
-                
-                noteItem.innerHTML = `
-                    <div class="note-title">${note.title}</div>
-                    <div class="note-preview">${textPreview.substring(0, 50)}${textPreview.length > 50 ? '...' : ''}</div>
-                    <div class="note-date">${formattedDate}</div>
-                `;
-                
-                noteItem.addEventListener('click', () => {
-                    loadNoteForEditing(note.id);
-                });
-                
-                notesList.appendChild(noteItem);
-            });
-        }
+        });
+    });
+}
 
         function renderTimetable() {
             timetableGrid.innerHTML = '';
@@ -4147,19 +4273,17 @@
         }
 
         function editTask(taskId) {
-            const task = state.tasks.find(t => t.id === taskId);
-            if (task && !task.completed) {
-                document.getElementById('task-modal-title').textContent = 'Edit Task';
-                document.getElementById('edit-task-id').value = task.id;
-                document.getElementById('task-title').value = task.title;
-                document.getElementById('task-description').value = task.description || '';
-                document.getElementById('task-due').value = task.due;
-                document.getElementById('task-subject').value = task.subject || '';
-                taskModal.classList.add('active');
-            } else if (task.completed) {
-                showToast('Cannot edit completed tasks', 'error');
-            }
-        }
+    const task = state.tasks.find(t => t.id === taskId);
+    if (task) {
+        document.getElementById('task-modal-title').textContent = 'Edit Task';
+        document.getElementById('edit-task-id').value = task.id;
+        document.getElementById('task-title').value = task.title;
+        document.getElementById('task-description').value = task.description || '';
+        document.getElementById('task-due').value = task.due;
+        document.getElementById('task-subject').value = task.subject || '';
+        taskModal.classList.add('active');
+    }
+}
 
         function deleteTask(taskId) {
             if (confirm('Are you sure you want to delete this task?')) {
@@ -4182,6 +4306,11 @@
                     item.classList.remove('active');
                 });
                 document.querySelector(`[data-note-id="${noteId}"]`).classList.add('active');
+                
+                // Update read-only view if in view mode
+                if (state.notesViewMode === 'view') {
+                    updateNotesReadonlyView();
+                }
             }
         }
 
@@ -4537,4 +4666,3 @@
     </script>
 </body>
 </html>
-
