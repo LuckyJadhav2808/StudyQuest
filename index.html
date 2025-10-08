@@ -14,6 +14,8 @@
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
     <style>
         :root {
             --primary-dark: #1a1a2e;
@@ -283,6 +285,257 @@
         .environment-desc {
             font-size: 12px;
             color: var(--text-muted);
+        }
+
+        /* New Feature Styles */
+        .quick-templates {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .template-btn {
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+            color: var(--text-light);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        .light-theme .template-btn {
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .template-btn:hover, .template-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .code-block {
+            position: relative;
+            margin: 15px 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 12px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .copy-code-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-light);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: var(--transition);
+        }
+
+        .copy-code-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .code-content {
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .light-theme .code-content {
+            background: rgba(0, 0, 0, 0.05);
+            color: #333;
+        }
+
+        .session-resume {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--info);
+        }
+
+        .light-theme .session-resume {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .seasonal-theme {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+        }
+
+        .light-theme .seasonal-theme {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .mood-checkin {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .mood-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .mood-btn:hover, .mood-btn.active {
+            border-color: var(--accent);
+            transform: scale(1.1);
+        }
+
+        .session-templates {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .session-template {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .light-theme .session-template {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .session-template:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .session-template.active {
+            border-color: var(--success);
+        }
+
+        .story-creator {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .light-theme .story-creator {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .whiteboard-container {
+            width: 100%;
+            height: 400px;
+            background: white;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .whiteboard-tools {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .whiteboard-tool {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .whiteboard-tool:hover, .whiteboard-tool.active {
+            background: var(--accent);
+        }
+
+        .study-quests {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .quest-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .light-theme .quest-card {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .quest-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .quest-card.active {
+            border-color: var(--success);
+        }
+
+        .quest-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .session-naming {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .session-name {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .session-name:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
 
         /* Animations */
@@ -2025,6 +2278,23 @@
                             </h2>
                         </div>
                         <div class="widget-content">
+                            <!-- Quick Note Templates -->
+                            <div class="quick-templates">
+                                <button class="template-btn" data-template="lecture">Lecture Notes</button>
+                                <button class="template-btn" data-template="book">Book Summary</button>
+                                <button class="template-btn" data-template="meeting">Meeting Notes</button>
+                                <button class="template-btn" data-template="code">Code Snippet</button>
+                            </div>
+                            
+                            <!-- Session Quick Resume -->
+                            <div class="session-resume" id="session-resume" style="display: none;">
+                                <h3><i class="fas fa-history"></i> Continue Previous Session</h3>
+                                <p id="resume-session-info">You have an unfinished session from earlier.</p>
+                                <button class="btn btn-primary" id="resume-session-btn">
+                                    <i class="fas fa-play"></i> Resume Session
+                                </button>
+                            </div>
+                            
                             <div class="notes-view-mode">
                                 <button class="view-mode-btn active" id="edit-mode-btn">
                                     <i class="fas fa-edit"></i> Edit Mode
@@ -2115,6 +2385,47 @@
                 
                 <div class="widget">
                     <div class="widget-content">
+                        <!-- Seasonal Theme Indicator -->
+                        <div class="seasonal-theme" id="seasonal-theme" style="display: none;">
+                            <div id="seasonal-icon">🎃</div>
+                            <div id="seasonal-message">Halloween Theme Active! Spooky studying!</div>
+                        </div>
+                        
+                        <!-- Quick Mood Check-in -->
+                        <div class="mood-checkin">
+                            <div class="mood-btn" data-mood="happy">😊</div>
+                            <div class="mood-btn" data-mood="neutral">😐</div>
+                            <div class="mood-btn" data-mood="sad">😔</div>
+                            <div class="mood-btn" data-mood="tired">😴</div>
+                            <div class="mood-btn" data-mood="focused">🧠</div>
+                        </div>
+                        
+                        <!-- Quick Session Templates -->
+                        <div class="session-templates">
+                            <div class="session-template" data-template="last">
+                                <h3><i class="fas fa-history"></i> Last Session</h3>
+                                <p>Resume your previous study setup</p>
+                            </div>
+                            <div class="session-template" data-template="energy">
+                                <h3><i class="fas fa-bolt"></i> Energy Boost</h3>
+                                <p>Short, high-intensity focus bursts</p>
+                            </div>
+                            <div class="session-template" data-template="deep">
+                                <h3><i class="fas fa-brain"></i> Deep Work</h3>
+                                <p>Extended focus with longer breaks</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Study Session Naming -->
+                        <div class="session-naming">
+                            <div class="session-name" id="session-name-1">Quantum Quest</div>
+                            <div class="session-name" id="session-name-2">Code Crusade</div>
+                            <div class="session-name" id="session-name-3">History Hunt</div>
+                            <button class="btn btn-secondary" id="generate-session-name">
+                                <i class="fas fa-random"></i> New Name
+                            </button>
+                        </div>
+                        
                         <div class="timer-container">
                             <div class="timer-display" id="timer-display">25:00</div>
                             <div class="timer-controls">
@@ -2150,6 +2461,111 @@
                                     <div class="progress-fill" id="sessions-progress" style="width: 0%"></div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Study Story Creator -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <h2 class="widget-title">
+                            <i class="fas fa-book-open"></i>
+                            Study Story Creator
+                        </h2>
+                    </div>
+                    <div class="widget-content">
+                        <div class="story-creator">
+                            <div class="form-group">
+                                <label class="form-label" for="story-topic">Story Topic</label>
+                                <input type="text" class="form-control" id="story-topic" placeholder="Enter a topic to turn into a story">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="story-style">Story Style</label>
+                                <select class="form-control" id="story-style">
+                                    <option value="adventure">Adventure</option>
+                                    <option value="mystery">Mystery</option>
+                                    <option value="scifi">Sci-Fi</option>
+                                    <option value="fantasy">Fantasy</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" id="generate-story-btn">
+                                <i class="fas fa-magic"></i> Generate Story
+                            </button>
+                            <div id="story-output" style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px; display: none;">
+                                <!-- Story will be generated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Interactive Whiteboard -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <h2 class="widget-title">
+                            <i class="fas fa-palette"></i>
+                            Interactive Whiteboard
+                        </h2>
+                    </div>
+                    <div class="widget-content">
+                        <div class="whiteboard-tools">
+                            <button class="whiteboard-tool active" data-tool="pen">
+                                <i class="fas fa-pen"></i> Pen
+                            </button>
+                            <button class="whiteboard-tool" data-tool="eraser">
+                                <i class="fas fa-eraser"></i> Eraser
+                            </button>
+                            <button class="whiteboard-tool" data-tool="shape">
+                                <i class="fas fa-square"></i> Shapes
+                            </button>
+                            <button class="whiteboard-tool" id="clear-whiteboard">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                        </div>
+                        <div class="whiteboard-container" id="whiteboard">
+                            <canvas id="whiteboard-canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Study Quests -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <h2 class="widget-title">
+                            <i class="fas fa-quest"></i>
+                            Study Quests
+                        </h2>
+                    </div>
+                    <div class="widget-content">
+                        <div class="study-quests">
+                            <div class="quest-card" data-quest="researcher">
+                                <div class="quest-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <h3>Researcher</h3>
+                                <p>Gather information and analyze data</p>
+                                <div class="quest-ability">Ability: +25% XP from notes</div>
+                            </div>
+                            <div class="quest-card" data-quest="analyst">
+                                <div class="quest-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <h3>Analyst</h3>
+                                <p>Break down complex problems</p>
+                                <div class="quest-ability">Ability: Unlock advanced insights</div>
+                            </div>
+                            <div class="quest-card" data-quest="creator">
+                                <div class="quest-icon">
+                                    <i class="fas fa-paint-brush"></i>
+                                </div>
+                                <h3>Creator</h3>
+                                <p>Build and design new solutions</p>
+                                <div class="quest-ability">Ability: Enhanced whiteboard tools</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-primary" id="select-quest-btn">
+                                <i class="fas fa-check"></i> Select Quest
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -2708,7 +3124,20 @@
             emojiLevel: 1,
             environment: "clear",
             mindMaps: [],
-            currentMindMap: null
+            currentMindMap: null,
+            // New state for additional features
+            quickTemplates: {
+                lecture: "<h2>Lecture Notes</h2><h3>Topic:</h3><p>Main points:</p><ul><li>Key concept 1</li><li>Key concept 2</li><li>Key concept 3</li></ul><h3>Summary:</h3><p>Overall understanding:</p>",
+                book: "<h2>Book Summary</h2><h3>Title:</h3><p>Author:</p><h3>Key Takeaways:</h3><ul><li>Important point 1</li><li>Important point 2</li><li>Important point 3</li></ul><h3>Quotes:</h3><blockquote>Memorable quote</blockquote>",
+                meeting: "<h2>Meeting Notes</h2><h3>Date:</h3><p>Attendees:</p><h3>Agenda:</h3><ol><li>Topic 1</li><li>Topic 2</li><li>Topic 3</li></ol><h3>Action Items:</h3><ul><li>Task 1 - Owner - Due Date</li><li>Task 2 - Owner - Due Date</li></ul>",
+                code: "<h2>Code Documentation</h2><h3>Function:</h3><div class='code-block'><div class='code-header'>JavaScript <button class='copy-code-btn'>Copy</button></div><div class='code-content'><pre><code class='language-javascript'>// Your code here\nfunction example() {\n  return \"Hello, World!\";\n}</code></pre></div></div><h3>Explanation:</h3><p>What this code does:</p>"
+            },
+            currentMood: null,
+            seasonalTheme: null,
+            activeQuest: null,
+            sessionHistory: [],
+            whiteboardData: null,
+            storyHistory: []
         };
 
         // DOM Elements
@@ -2801,6 +3230,25 @@
         const mindMapContainer = document.getElementById('mind-map-container');
         const copyNoteBtn = document.getElementById('copy-note-btn');
         const summarizeNoteBtn = document.getElementById('summarize-note-btn');
+        
+        // New DOM Elements for Additional Features
+        const templateButtons = document.querySelectorAll('.template-btn');
+        const sessionResume = document.getElementById('session-resume');
+        const resumeSessionBtn = document.getElementById('resume-session-btn');
+        const moodButtons = document.querySelectorAll('.mood-btn');
+        const seasonalThemeIndicator = document.getElementById('seasonal-theme');
+        const sessionTemplates = document.querySelectorAll('.session-template');
+        const sessionNameElements = document.querySelectorAll('.session-name');
+        const generateSessionNameBtn = document.getElementById('generate-session-name');
+        const storyTopicInput = document.getElementById('story-topic');
+        const storyStyleSelect = document.getElementById('story-style');
+        const generateStoryBtn = document.getElementById('generate-story-btn');
+        const storyOutput = document.getElementById('story-output');
+        const whiteboardCanvas = document.getElementById('whiteboard-canvas');
+        const whiteboardTools = document.querySelectorAll('.whiteboard-tool');
+        const clearWhiteboardBtn = document.getElementById('clear-whiteboard');
+        const questCards = document.querySelectorAll('.quest-card');
+        const selectQuestBtn = document.getElementById('select-quest-btn');
 
         // Quill Editor
         const quill = new Quill('#editor', {
@@ -2829,6 +3277,15 @@
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
 
+        // Whiteboard Variables
+        let whiteboardCtx;
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let currentTool = 'pen';
+        let currentColor = '#e94560';
+        let currentLineWidth = 2;
+
         // Initialize the application
         function init() {
             loadState();
@@ -2844,6 +3301,16 @@
             setupFocusEmoji();
             setupEnvironment();
             setupMindMap();
+            
+            // Initialize new features
+            setupQuickTemplates();
+            setupSessionResume();
+            setupMoodCheckin();
+            setupSeasonalThemes();
+            setupSessionTemplates();
+            setupSessionNaming();
+            setupWhiteboard();
+            setupStudyQuests();
             
             // Check if user studied today for streak
             checkStreak();
@@ -2905,6 +3372,20 @@
                 // Update emoji level
                 if (state.emojiLevel) {
                     updateEmojiLevel(state.emojiLevel);
+                }
+                
+                // Update seasonal theme
+                if (state.seasonalTheme) {
+                    applySeasonalTheme(state.seasonalTheme);
+                }
+                
+                // Update active quest
+                if (state.activeQuest) {
+                    questCards.forEach(card => {
+                        if (card.getAttribute('data-quest') === state.activeQuest) {
+                            card.classList.add('active');
+                        }
+                    });
                 }
             }
         }
@@ -3139,6 +3620,9 @@
             
             // Enhanced feature event listeners
             setupEnhancedFeatureListeners();
+            
+            // New feature event listeners
+            setupNewFeatureListeners();
         }
 
         // Setup enhanced feature event listeners
@@ -3157,6 +3641,477 @@
             // Note sharing
             copyNoteBtn.addEventListener('click', copyNoteToClipboard);
             summarizeNoteBtn.addEventListener('click', summarizeNote);
+        }
+
+        // Setup new feature event listeners
+        function setupNewFeatureListeners() {
+            // Quick templates
+            templateButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const template = btn.getAttribute('data-template');
+                    applyQuickTemplate(template);
+                });
+            });
+            
+            // Session resume
+            resumeSessionBtn.addEventListener('click', resumeLastSession);
+            
+            // Mood check-in
+            moodButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const mood = btn.getAttribute('data-mood');
+                    setMood(mood);
+                });
+            });
+            
+            // Session templates
+            sessionTemplates.forEach(template => {
+                template.addEventListener('click', () => {
+                    const templateType = template.getAttribute('data-template');
+                    applySessionTemplate(templateType);
+                });
+            });
+            
+            // Session naming
+            generateSessionNameBtn.addEventListener('click', generateSessionName);
+            sessionNameElements.forEach(name => {
+                name.addEventListener('click', () => {
+                    sessionNameElements.forEach(n => n.style.background = 'rgba(255, 255, 255, 0.1)');
+                    name.style.background = 'rgba(233, 69, 96, 0.3)';
+                });
+            });
+            
+            // Story creator
+            generateStoryBtn.addEventListener('click', generateStory);
+            
+            // Whiteboard
+            whiteboardTools.forEach(tool => {
+                tool.addEventListener('click', () => {
+                    whiteboardTools.forEach(t => t.classList.remove('active'));
+                    tool.classList.add('active');
+                    currentTool = tool.getAttribute('data-tool');
+                });
+            });
+            
+            clearWhiteboardBtn.addEventListener('click', clearWhiteboard);
+            
+            // Study quests
+            questCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    questCards.forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                });
+            });
+            
+            selectQuestBtn.addEventListener('click', selectQuest);
+        }
+
+        // New Feature Implementations
+
+        // Quick Note Templates
+        function setupQuickTemplates() {
+            // Already set up in event listeners
+        }
+
+        function applyQuickTemplate(template) {
+            if (state.quickTemplates[template]) {
+                quill.root.innerHTML = state.quickTemplates[template];
+                
+                // If it's a code template, set up syntax highlighting
+                if (template === 'code') {
+                    setTimeout(() => {
+                        document.querySelectorAll('pre code').forEach((block) => {
+                            hljs.highlightElement(block);
+                        });
+                        
+                        // Add copy functionality to code blocks
+                        document.querySelectorAll('.copy-code-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const codeContent = this.parentElement.nextElementSibling.textContent;
+                                navigator.clipboard.writeText(codeContent).then(() => {
+                                    showToast('Code copied to clipboard!');
+                                });
+                            });
+                        });
+                    }, 100);
+                }
+                
+                showToast(`${template.charAt(0).toUpperCase() + template.slice(1)} template applied!`);
+            }
+        }
+
+        // Session Quick Resume
+        function setupSessionResume() {
+            // Check if there's a recent session to resume
+            if (state.sessionHistory && state.sessionHistory.length > 0) {
+                const lastSession = state.sessionHistory[state.sessionHistory.length - 1];
+                const sessionTime = new Date(lastSession.endTime);
+                const now = new Date();
+                const hoursSinceSession = (now - sessionTime) / (1000 * 60 * 60);
+                
+                // Show resume option if session was within the last 24 hours
+                if (hoursSinceSession < 24) {
+                    sessionResume.style.display = 'block';
+                    document.getElementById('resume-session-info').textContent = 
+                        `You have an unfinished ${lastSession.type} session from ${sessionTime.toLocaleTimeString()}.`;
+                }
+            }
+        }
+
+        function resumeLastSession() {
+            if (state.sessionHistory && state.sessionHistory.length > 0) {
+                const lastSession = state.sessionHistory[state.sessionHistory.length - 1];
+                
+                // Apply session settings
+                if (lastSession.timerMode) {
+                    modeButtons.forEach(btn => {
+                        if (btn.getAttribute('data-minutes') === lastSession.timerMode.toString()) {
+                            btn.click();
+                        }
+                    });
+                }
+                
+                if (lastSession.noteId) {
+                    loadNoteForEditing(lastSession.noteId);
+                }
+                
+                showToast('Previous session resumed!');
+                sessionResume.style.display = 'none';
+            }
+        }
+
+        // Quick Mood Check-in
+        function setupMoodCheckin() {
+            // Already set up in event listeners
+        }
+
+        function setMood(mood) {
+            state.currentMood = mood;
+            
+            // Update UI
+            moodButtons.forEach(btn => {
+                if (btn.getAttribute('data-mood') === mood) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Provide mood-based recommendations
+            let recommendation = '';
+            switch(mood) {
+                case 'happy':
+                    recommendation = 'Great! Use this positive energy for challenging tasks.';
+                    break;
+                case 'neutral':
+                    recommendation = 'Good time for routine studying and review.';
+                    break;
+                case 'sad':
+                    recommendation = 'Try starting with easier tasks to build momentum.';
+                    break;
+                case 'tired':
+                    recommendation = 'Consider shorter sessions with more breaks.';
+                    break;
+                case 'focused':
+                    recommendation = 'Perfect for deep work and complex topics.';
+                    break;
+            }
+            
+            showToast(`Mood set to ${mood}. ${recommendation}`);
+            saveState();
+        }
+
+        // Seasonal Themes
+        function setupSeasonalThemes() {
+            const now = new Date();
+            const month = now.getMonth() + 1; // 1-12
+            const day = now.getDate();
+            
+            let theme = null;
+            
+            // Halloween (October)
+            if (month === 10) {
+                theme = 'halloween';
+            }
+            // Christmas (December)
+            else if (month === 12 && day >= 15 && day <= 26) {
+                theme = 'christmas';
+            }
+            // New Year (Late December - Early January)
+            else if ((month === 12 && day >= 28) || (month === 1 && day <= 7)) {
+                theme = 'newyear';
+            }
+            // Valentine's Day (February)
+            else if (month === 2 && day >= 10 && day <= 16) {
+                theme = 'valentines';
+            }
+            
+            if (theme) {
+                applySeasonalTheme(theme);
+            }
+        }
+
+        function applySeasonalTheme(theme) {
+            state.seasonalTheme = theme;
+            
+            let icon = '';
+            let message = '';
+            let achievementId = null;
+            
+            switch(theme) {
+                case 'halloween':
+                    icon = '🎃';
+                    message = 'Halloween Theme Active! Spooky studying!';
+                    achievementId = 'seasonal_halloween';
+                    break;
+                case 'christmas':
+                    icon = '🎄';
+                    message = 'Christmas Theme Active! Festive studying!';
+                    achievementId = 'seasonal_christmas';
+                    break;
+                case 'newyear':
+                    icon = '🎉';
+                    message = 'New Year Theme Active! Fresh start studying!';
+                    achievementId = 'seasonal_newyear';
+                    break;
+                case 'valentines':
+                    icon = '❤️';
+                    message = 'Valentine\'s Theme Active! Loving your studies!';
+                    achievementId = 'seasonal_valentines';
+                    break;
+            }
+            
+            seasonalThemeIndicator.style.display = 'flex';
+            document.getElementById('seasonal-icon').textContent = icon;
+            document.getElementById('seasonal-message').textContent = message;
+            
+            // Award seasonal achievement if not already unlocked
+            if (achievementId && !state.achievements.find(a => a.id === achievementId && a.unlocked)) {
+                // This would require adding seasonal achievements to the state
+                showToast(`Seasonal theme activated! ${message}`);
+            }
+            
+            saveState();
+        }
+
+        // Quick Session Templates
+        function setupSessionTemplates() {
+            // Already set up in event listeners
+        }
+
+        function applySessionTemplate(templateType) {
+            sessionTemplates.forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-template="${templateType}"]`).classList.add('active');
+            
+            switch(templateType) {
+                case 'last':
+                    // Resume last session settings
+                    resumeLastSession();
+                    break;
+                case 'energy':
+                    // Energy boost: shorter focus, shorter breaks
+                    document.querySelector('[data-minutes="15"]').click();
+                    showToast('Energy Boost template applied! Short, intense focus sessions.');
+                    break;
+                case 'deep':
+                    // Deep work: longer focus, longer breaks
+                    document.querySelector('[data-minutes="45"]').click();
+                    showToast('Deep Work template applied! Extended focus sessions.');
+                    break;
+            }
+        }
+
+        // Study Session Naming
+        function setupSessionNaming() {
+            // Already set up in event listeners
+        }
+
+        function generateSessionName() {
+            const themes = [
+                { prefix: 'Quantum', suffix: ['Quest', 'Voyage', 'Expedition', 'Mission'] },
+                { prefix: 'Code', suffix: ['Crusade', 'Adventure', 'Journey', 'Challenge'] },
+                { prefix: 'History', suffix: ['Hunt', 'Exploration', 'Discovery', 'Investigation'] },
+                { prefix: 'Math', suffix: ['Marathon', 'Puzzle', 'Problem', 'Equation'] },
+                { prefix: 'Science', suffix: ['Experiment', 'Research', 'Study', 'Analysis'] },
+                { prefix: 'Language', suffix: ['Immersion', 'Practice', 'Study', 'Session'] }
+            ];
+            
+            const theme = themes[Math.floor(Math.random() * themes.length)];
+            const suffix = theme.suffix[Math.floor(Math.random() * theme.suffix.length)];
+            const name = `${theme.prefix} ${suffix}`;
+            
+            // Update one of the session name elements
+            const randomIndex = Math.floor(Math.random() * sessionNameElements.length);
+            sessionNameElements[randomIndex].textContent = name;
+            sessionNameElements[randomIndex].style.background = 'rgba(233, 69, 96, 0.3)';
+            
+            showToast(`New session name: ${name}`);
+        }
+
+        // Study Story Creator
+        function generateStory() {
+            const topic = storyTopicInput.value.trim();
+            const style = storyStyleSelect.value;
+            
+            if (!topic) {
+                showToast('Please enter a topic for your story', 'error');
+                return;
+            }
+            
+            // Simple story generation based on topic and style
+            let story = '';
+            
+            const introductions = {
+                adventure: `In a world where knowledge is power, our hero embarks on a quest to master ${topic}. `,
+                mystery: `A puzzling enigma surrounds ${topic}, and only through careful study can the truth be uncovered. `,
+                scifi: `In the future, understanding ${topic} holds the key to saving humanity from an unknown threat. `,
+                fantasy: `In a realm of magic and wonder, the ancient secrets of ${topic} await discovery. `
+            };
+            
+            const challenges = {
+                adventure: `Along the journey, our hero faces challenges that test their understanding of ${topic}. `,
+                mystery: `Clues are scattered throughout the material, each revealing a piece of the ${topic} puzzle. `,
+                scifi: `Advanced algorithms and simulations help unravel the complexities of ${topic}. `,
+                fantasy: `Magical creatures and ancient texts provide insights into the mysteries of ${topic}. `
+            };
+            
+            const resolutions = {
+                adventure: `After overcoming all obstacles, our hero achieves mastery of ${topic}, gaining wisdom and power.`,
+                mystery: `The final piece falls into place, revealing the complete picture of ${topic} in all its glory.`,
+                scifi: `The knowledge of ${topic} proves instrumental in advancing technology and understanding the universe.`,
+                fantasy: `With ${topic} now understood, new magical abilities are unlocked, opening doors to greater wonders.`
+            };
+            
+            story = introductions[style] + challenges[style] + resolutions[style];
+            
+            storyOutput.innerHTML = `
+                <h3>Your ${style} story about ${topic}:</h3>
+                <p>${story}</p>
+                <button class="btn btn-secondary" id="save-story-btn">
+                    <i class="fas fa-save"></i> Save Story
+                </button>
+            `;
+            storyOutput.style.display = 'block';
+            
+            // Add event listener to save story button
+            document.getElementById('save-story-btn').addEventListener('click', () => {
+                saveStory(topic, story);
+            });
+            
+            // Add to story history
+            state.storyHistory.push({
+                topic: topic,
+                style: style,
+                story: story,
+                timestamp: new Date().toISOString()
+            });
+            saveState();
+        }
+
+        function saveStory(topic, story) {
+            // Create a note from the story
+            const storyNote = {
+                id: generateId(),
+                title: `Story: ${topic}`,
+                content: `<h2>${topic} - A Learning Story</h2><p>${story}</p>`,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            state.notes.push(storyNote);
+            saveState();
+            renderNotes();
+            
+            showToast('Story saved as a note!');
+        }
+
+        // Interactive Whiteboard
+        function setupWhiteboard() {
+            const canvas = whiteboardCanvas;
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = 400;
+            whiteboardCtx = canvas.getContext('2d');
+            
+            // Set initial whiteboard style
+            whiteboardCtx.strokeStyle = currentColor;
+            whiteboardCtx.lineWidth = currentLineWidth;
+            whiteboardCtx.lineCap = 'round';
+            whiteboardCtx.lineJoin = 'round';
+            
+            // Whiteboard event listeners
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Touch events for mobile
+            canvas.addEventListener('touchstart', handleTouch);
+            canvas.addEventListener('touchmove', handleTouch);
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousedown', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            whiteboardCanvas.dispatchEvent(mouseEvent);
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            whiteboardCtx.beginPath();
+            whiteboardCtx.moveTo(lastX, lastY);
+            whiteboardCtx.lineTo(e.offsetX, e.offsetY);
+            whiteboardCtx.stroke();
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function clearWhiteboard() {
+            whiteboardCtx.clearRect(0, 0, whiteboardCanvas.width, whiteboardCanvas.height);
+        }
+
+        // Study Quests
+        function setupStudyQuests() {
+            // Already set up in event listeners
+        }
+
+        function selectQuest() {
+            const activeQuestCard = document.querySelector('.quest-card.active');
+            if (activeQuestCard) {
+                const quest = activeQuestCard.getAttribute('data-quest');
+                state.activeQuest = quest;
+                
+                let ability = '';
+                switch(quest) {
+                    case 'researcher':
+                        ability = '+25% XP from notes';
+                        break;
+                    case 'analyst':
+                        ability = 'Unlock advanced insights';
+                        break;
+                    case 'creator':
+                        ability = 'Enhanced whiteboard tools';
+                        break;
+                }
+                
+                showToast(`Quest selected: ${quest}! Ability: ${ability}`);
+                saveState();
+            } else {
+                showToast('Please select a quest first', 'error');
+            }
         }
 
         // Form submission handlers
@@ -5607,8 +6562,6 @@
             }
         `;
         document.head.appendChild(style);
-
-        // Start the application
         init();
     </script>
 </body>
