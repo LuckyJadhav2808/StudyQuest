@@ -6,9 +6,8 @@
     <title>StudyQuest - Your Gamified Productivity Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-     <link rel="icon" type="image/png" href="StudyQuest.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="StudyQuest.png" sizes="192x192">
     <link rel="icon" type="image/png" href="StudyQuest.png" sizes="512x512">
-
     <link rel="apple-touch-icon" href="StudyQuest.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -63,8 +62,282 @@
             min-height: 100vh;
             overflow-x: hidden;
             transition: var(--transition);
+            position: relative;
         }
 
+        /* Environment Effects */
+        .environment-effects {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .rain-drop, .snow-flake {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .rain-drop {
+            background: linear-gradient(to bottom, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+            width: 2px;
+            height: 15px;
+            border-radius: 1px;
+        }
+
+        .snow-flake {
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+        }
+
+        /* Focus Emoji */
+        .focus-emoji-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .focus-emoji {
+            font-size: 60px;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+            position: relative;
+        }
+
+        .focus-emoji.power-up {
+            animation: pulse 1.5s infinite;
+        }
+
+        .focus-emoji.bounce {
+            animation: bounce 0.5s;
+        }
+
+        .focus-emoji.pulse {
+            animation: pulse 1s;
+        }
+
+        .emoji-power-up-indicator {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        .emoji-message {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            white-space: nowrap;
+            margin-bottom: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .emoji-message.show {
+            opacity: 1;
+        }
+
+        .emoji-evolution {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            border-radius: 20px;
+            padding: 2px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .focus-emoji.evolved .emoji-evolution {
+            display: block;
+        }
+
+        /* Mind Map Styles */
+        .mind-map-container {
+            width: 100%;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .light-theme .mind-map-container {
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .mind-map-node {
+            position: absolute;
+            background: var(--primary);
+            border: 2px solid var(--accent);
+            border-radius: var(--border-radius);
+            padding: 10px 15px;
+            min-width: 120px;
+            cursor: move;
+            box-shadow: var(--box-shadow);
+            z-index: 10;
+        }
+
+        .light-theme .mind-map-node {
+            background: var(--primary);
+        }
+
+        .mind-map-node.active {
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px rgba(76, 217, 123, 0.3);
+        }
+
+        .mind-map-node .node-content {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .mind-map-node .node-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+            gap: 5px;
+        }
+
+        .mind-map-connection {
+            position: absolute;
+            background: var(--accent);
+            height: 2px;
+            transform-origin: 0 0;
+            z-index: 5;
+        }
+
+        /* Note Sharing */
+        .note-sharing-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* Environment Selector */
+        .environment-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .environment-option {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .light-theme .environment-option {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .environment-option:hover, .environment-option.active {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .environment-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .environment-name {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .environment-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Animations */
+        @keyframes bounce {
+            0%, 20%, 60%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            80% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes rainFall {
+            0% {
+                transform: translateY(-100px);
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px));
+            }
+        }
+
+        @keyframes snowFall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) rotate(360deg);
+            }
+        }
+
+        /* Rest of the existing CSS remains the same */
         .app-container {
             display: flex;
             min-height: 100vh;
@@ -209,6 +482,8 @@
             padding: 20px;
             overflow-y: auto;
             transition: var(--transition);
+            position: relative;
+            z-index: 10;
         }
 
         .header {
@@ -1393,6 +1668,17 @@
     </style>
 </head>
 <body>
+    <!-- Environment Effects -->
+    <div class="environment-effects" id="environment-effects"></div>
+
+    <!-- Focus Emoji -->
+    <div class="focus-emoji-container" id="focus-emoji-container">
+        <div class="focus-emoji" id="focus-emoji">🐉</div>
+        <div class="emoji-message" id="emoji-message"></div>
+        <div class="emoji-power-up-indicator" id="emoji-power-up-indicator">⚡</div>
+        <div class="emoji-evolution" id="emoji-evolution">Lv. 1</div>
+    </div>
+
     <!-- Mobile Menu Toggle -->
     <button class="mobile-menu-toggle" id="mobile-menu-toggle">
         <i class="fas fa-bars"></i>
@@ -1746,12 +2032,24 @@
                                 <button class="view-mode-btn" id="view-mode-btn">
                                     <i class="fas fa-eye"></i> View Mode
                                 </button>
+                                <button class="view-mode-btn" id="mind-map-mode-btn">
+                                    <i class="fas fa-project-diagram"></i> Mind Map
+                                </button>
                             </div>
                             <div class="form-group">
                                 <input type="text" class="form-control" id="note-title" placeholder="Note Title">
                             </div>
                             <div id="editor"></div>
                             <div id="notes-readonly" class="notes-readonly" style="display: none;"></div>
+                            <div id="mind-map-container" class="mind-map-container" style="display: none;"></div>
+                            <div class="note-sharing-options">
+                                <button class="btn btn-secondary" id="copy-note-btn">
+                                    <i class="fas fa-copy"></i> Copy Note
+                                </button>
+                                <button class="btn btn-secondary" id="summarize-note-btn">
+                                    <i class="fas fa-file-alt"></i> Summarize
+                                </button>
+                            </div>
                             <div class="form-group" style="display: flex; gap: 10px; flex-wrap: wrap;">
                                 <button class="btn btn-primary" id="save-note-btn">
                                     <i class="fas fa-save"></i> Save Note
@@ -2125,6 +2423,41 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Environment Settings -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h2 class="widget-title">
+                                <i class="fas fa-cloud"></i>
+                                Study Environment
+                            </h2>
+                        </div>
+                        <div class="widget-content">
+                            <p>Choose your preferred study environment:</p>
+                            <div class="environment-selector" id="environment-selector">
+                                <div class="environment-option active" data-environment="clear">
+                                    <div class="environment-icon">☀️</div>
+                                    <div class="environment-name">Clear Day</div>
+                                    <div class="environment-desc">Bright and focused</div>
+                                </div>
+                                <div class="environment-option" data-environment="night">
+                                    <div class="environment-icon">🌙</div>
+                                    <div class="environment-name">Night</div>
+                                    <div class="environment-desc">Calm and peaceful</div>
+                                </div>
+                                <div class="environment-option" data-environment="rain">
+                                    <div class="environment-icon">🌧️</div>
+                                    <div class="environment-name">Rain</div>
+                                    <div class="environment-desc">Cozy and relaxing</div>
+                                </div>
+                                <div class="environment-option" data-environment="snow">
+                                    <div class="environment-icon">❄️</div>
+                                    <div class="environment-name">Snow</div>
+                                    <div class="environment-desc">Quiet and serene</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
         </div>
@@ -2364,7 +2697,18 @@
             lastActivityDate: null,
             studyPredictions: {},
             surpriseRewards: [],
-            notesViewMode: "edit" // 'edit' or 'view'
+            notesViewMode: "edit", // 'edit' or 'view'
+            // New state properties for enhanced features
+            emojiPowerUps: {
+                dragon: { active: false, endTime: null, xpMultiplier: 2 },
+                owl: { active: false, endTime: null, reducedNotifications: true },
+                rocket: { active: false, endTime: null, taskBonus: 1.5 },
+                brain: { active: false, endTime: null, betterPredictions: true }
+            },
+            emojiLevel: 1,
+            environment: "clear",
+            mindMaps: [],
+            currentMindMap: null
         };
 
         // DOM Elements
@@ -2444,6 +2788,19 @@
         const notesReadonly = document.getElementById('notes-readonly');
         const copyDataBtn = document.getElementById('copy-data-btn');
         const autoDeleteCompletedBtn = document.getElementById('auto-delete-completed-btn');
+        
+        // New DOM Elements for Enhanced Features
+        const focusEmoji = document.getElementById('focus-emoji');
+        const emojiMessage = document.getElementById('emoji-message');
+        const emojiPowerUpIndicator = document.getElementById('emoji-power-up-indicator');
+        const emojiEvolution = document.getElementById('emoji-evolution');
+        const environmentEffects = document.getElementById('environment-effects');
+        const environmentSelector = document.getElementById('environment-selector');
+        const environmentOptions = document.querySelectorAll('.environment-option');
+        const mindMapModeBtn = document.getElementById('mind-map-mode-btn');
+        const mindMapContainer = document.getElementById('mind-map-container');
+        const copyNoteBtn = document.getElementById('copy-note-btn');
+        const summarizeNoteBtn = document.getElementById('summarize-note-btn');
 
         // Quill Editor
         const quill = new Quill('#editor', {
@@ -2483,12 +2840,18 @@
             updateSmartReminders();
             updateStudyPredictions();
             
+            // Initialize enhanced features
+            setupFocusEmoji();
+            setupEnvironment();
+            setupMindMap();
+            
             // Check if user studied today for streak
             checkStreak();
             
             // Set up interval for smart reminders
             setInterval(updateSmartReminders, 60000); // Update every minute
             setInterval(checkSurpriseRewards, 30000); // Check for surprise rewards every 30 seconds
+            setInterval(checkPowerUps, 1000); // Check power-up status every second
         }
 
         // Load state from localStorage
@@ -2519,6 +2882,7 @@
                             emoji.classList.remove('active');
                         }
                     });
+                    focusEmoji.textContent = state.focusEmoji;
                 }
                 
                 // Update session names
@@ -2531,6 +2895,16 @@
                 // Update notes view mode
                 if (state.notesViewMode) {
                     setNotesViewMode(state.notesViewMode);
+                }
+                
+                // Update environment
+                if (state.environment) {
+                    setEnvironment(state.environment);
+                }
+                
+                // Update emoji level
+                if (state.emojiLevel) {
+                    updateEmojiLevel(state.emojiLevel);
                 }
             }
         }
@@ -2695,6 +3069,11 @@
             viewModeBtn.addEventListener('click', () => {
                 setNotesViewMode('view');
             });
+            
+            // Mind map mode button
+            mindMapModeBtn.addEventListener('click', () => {
+                setNotesViewMode('mindmap');
+            });
 
             // Calendar navigation
             prevMonthBtn.addEventListener('click', () => {
@@ -2741,6 +3120,7 @@
                     focusEmojis.forEach(e => e.classList.remove('active'));
                     emoji.classList.add('active');
                     state.focusEmoji = emoji.getAttribute('data-emoji');
+                    focusEmoji.textContent = state.focusEmoji;
                     saveState();
                     showToast(`Focus emoji updated to ${state.focusEmoji}`);
                 });
@@ -2756,6 +3136,27 @@
 
             // Auto-delete completed tasks
             autoDeleteCompletedBtn.addEventListener('click', autoDeleteCompletedTasks);
+            
+            // Enhanced feature event listeners
+            setupEnhancedFeatureListeners();
+        }
+
+        // Setup enhanced feature event listeners
+        function setupEnhancedFeatureListeners() {
+            // Focus emoji interaction
+            focusEmoji.addEventListener('click', handleEmojiClick);
+            
+            // Environment selector
+            environmentOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const environment = option.getAttribute('data-environment');
+                    setEnvironment(environment);
+                });
+            });
+            
+            // Note sharing
+            copyNoteBtn.addEventListener('click', copyNoteToClipboard);
+            summarizeNoteBtn.addEventListener('click', summarizeNote);
         }
 
         // Form submission handlers
@@ -3133,23 +3534,35 @@
             state.notesViewMode = mode;
             saveState();
             
+            // Reset all modes
+            editModeBtn.classList.remove('active');
+            viewModeBtn.classList.remove('active');
+            mindMapModeBtn.classList.remove('active');
+            document.getElementById('editor').style.display = 'none';
+            notesReadonly.style.display = 'none';
+            mindMapContainer.style.display = 'none';
+            noteTitle.disabled = false;
+            saveNoteBtn.disabled = false;
+            
             if (mode === 'edit') {
                 editModeBtn.classList.add('active');
-                viewModeBtn.classList.remove('active');
                 document.getElementById('editor').style.display = 'block';
-                notesReadonly.style.display = 'none';
-                noteTitle.disabled = false;
-                saveNoteBtn.disabled = false;
-            } else {
-                editModeBtn.classList.remove('active');
+            } else if (mode === 'view') {
                 viewModeBtn.classList.add('active');
-                document.getElementById('editor').style.display = 'none';
                 notesReadonly.style.display = 'block';
                 noteTitle.disabled = true;
                 saveNoteBtn.disabled = true;
                 
                 // Update the read-only view
                 updateNotesReadonlyView();
+            } else if (mode === 'mindmap') {
+                mindMapModeBtn.classList.add('active');
+                mindMapContainer.style.display = 'block';
+                noteTitle.disabled = true;
+                saveNoteBtn.disabled = true;
+                
+                // Load or create mind map
+                loadMindMap();
             }
         }
 
@@ -3270,6 +3683,15 @@
             let xpEarned = 0;
             if (timerMode === 'focus') {
                 xpEarned = extendedSession ? 75 : 50;
+                
+                // Apply power-up bonuses
+                if (state.emojiPowerUps.dragon.active) {
+                    xpEarned *= state.emojiPowerUps.dragon.xpMultiplier;
+                }
+                if (state.emojiPowerUps.rocket.active) {
+                    xpEarned *= state.emojiPowerUps.rocket.taskBonus;
+                }
+                
                 state.timerSessions++;
                 
                 // Update sessions progress
@@ -3282,6 +3704,9 @@
                 
                 // Check for surprise rewards
                 checkSurpriseRewards();
+                
+                // Update emoji level based on XP
+                updateEmojiLevelBasedOnXP();
             } else if (timerMode === 'shortBreak') {
                 xpEarned = 10;
             } else if (timerMode === 'longBreak') {
@@ -3437,6 +3862,444 @@
                 document.body.classList.add('light-theme');
             } else {
                 document.body.classList.remove('light-theme');
+            }
+        }
+
+        // Enhanced Feature Functions
+
+        // Focus Emoji Functions
+        function setupFocusEmoji() {
+            focusEmoji.textContent = state.focusEmoji;
+            updateEmojiLevel(state.emojiLevel);
+            checkPowerUps();
+        }
+
+        function handleEmojiClick() {
+            // Bounce animation
+            focusEmoji.classList.add('bounce');
+            setTimeout(() => {
+                focusEmoji.classList.remove('bounce');
+            }, 500);
+            
+            // Show random message
+            const messages = [
+                "Keep going! You're doing great!",
+                "Stay focused! You've got this!",
+                "Every minute counts!",
+                "You're building great habits!",
+                "Your future self will thank you!",
+                "Knowledge is power!",
+                "Small steps lead to big achievements!",
+                "You're on fire! 🔥"
+            ];
+            
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            showEmojiMessage(randomMessage);
+            
+            // Chance to activate power-up
+            if (Math.random() < 0.1) { // 10% chance
+                activateRandomPowerUp();
+            }
+        }
+
+        function showEmojiMessage(message) {
+            emojiMessage.textContent = message;
+            emojiMessage.classList.add('show');
+            
+            setTimeout(() => {
+                emojiMessage.classList.remove('show');
+            }, 3000);
+        }
+
+        function activateRandomPowerUp() {
+            const powerUps = ['dragon', 'owl', 'rocket', 'brain'];
+            const randomPowerUp = powerUps[Math.floor(Math.random() * powerUps.length)];
+            
+            // Activate the power-up for 30 minutes
+            state.emojiPowerUps[randomPowerUp].active = true;
+            state.emojiPowerUps[randomPowerUp].endTime = new Date().getTime() + (30 * 60 * 1000);
+            
+            // Show power-up indicator
+            emojiPowerUpIndicator.style.display = 'flex';
+            focusEmoji.classList.add('power-up');
+            
+            // Show notification
+            const powerUpNames = {
+                dragon: 'Dragon Power-Up',
+                owl: 'Owl Power-Up',
+                rocket: 'Rocket Power-Up',
+                brain: 'Brain Power-Up'
+            };
+            
+            showToast(`🎉 ${powerUpNames[randomPowerUp]} activated! Bonus effects for 30 minutes!`, 'success');
+            
+            saveState();
+        }
+
+        function checkPowerUps() {
+            const now = new Date().getTime();
+            let anyActive = false;
+            
+            Object.keys(state.emojiPowerUps).forEach(powerUp => {
+                if (state.emojiPowerUps[powerUp].active && state.emojiPowerUps[powerUp].endTime < now) {
+                    // Power-up expired
+                    state.emojiPowerUps[powerUp].active = false;
+                }
+                
+                if (state.emojiPowerUps[powerUp].active) {
+                    anyActive = true;
+                }
+            });
+            
+            // Update UI
+            if (anyActive) {
+                emojiPowerUpIndicator.style.display = 'flex';
+                focusEmoji.classList.add('power-up');
+            } else {
+                emojiPowerUpIndicator.style.display = 'none';
+                focusEmoji.classList.remove('power-up');
+            }
+            
+            saveState();
+        }
+
+        function updateEmojiLevel(level) {
+            state.emojiLevel = level;
+            emojiEvolution.textContent = `Lv. ${level}`;
+            
+            if (level > 1) {
+                focusEmoji.classList.add('evolved');
+            } else {
+                focusEmoji.classList.remove('evolved');
+            }
+            
+            saveState();
+        }
+
+        function updateEmojiLevelBasedOnXP() {
+            const newLevel = Math.floor(state.xp / 1000) + 1;
+            if (newLevel > state.emojiLevel) {
+                updateEmojiLevel(newLevel);
+                showEmojiMessage(`Level up! Your focus emoji is now level ${newLevel}!`);
+            }
+        }
+
+        // Environment Functions
+        function setupEnvironment() {
+            setEnvironment(state.environment);
+        }
+
+        function setEnvironment(environment) {
+            state.environment = environment;
+            
+            // Update environment options
+            environmentOptions.forEach(option => {
+                if (option.getAttribute('data-environment') === environment) {
+                    option.classList.add('active');
+                } else {
+                    option.classList.remove('active');
+                }
+            });
+            
+            // Clear existing effects
+            environmentEffects.innerHTML = '';
+            
+            // Apply environment effects
+            if (environment === 'clear') {
+                document.body.style.background = 'linear-gradient(135deg, var(--primary-dark), var(--primary))';
+            } else if (environment === 'night') {
+                document.body.style.background = 'linear-gradient(135deg, #0a0a1a, #1a1a2e)';
+            } else if (environment === 'rain') {
+                document.body.style.background = 'linear-gradient(135deg, #2c3e50, #34495e)';
+                createRainEffect();
+            } else if (environment === 'snow') {
+                document.body.style.background = 'linear-gradient(135deg, #2c3e50, #95a5a6)';
+                createSnowEffect();
+            }
+            
+            saveState();
+        }
+
+        function createRainEffect() {
+            for (let i = 0; i < 50; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'rain-drop';
+                drop.style.left = `${Math.random() * 100}%`;
+                drop.style.animationDelay = `${Math.random() * 5}s`;
+                drop.style.animationDuration = `${0.5 + Math.random() * 0.5}s`;
+                environmentEffects.appendChild(drop);
+            }
+        }
+
+        function createSnowEffect() {
+            for (let i = 0; i < 30; i++) {
+                const flake = document.createElement('div');
+                flake.className = 'snow-flake';
+                flake.style.left = `${Math.random() * 100}%`;
+                flake.style.width = `${3 + Math.random() * 5}px`;
+                flake.style.height = flake.style.width;
+                flake.style.animationDelay = `${Math.random() * 5}s`;
+                flake.style.animationDuration = `${3 + Math.random() * 7}s`;
+                environmentEffects.appendChild(flake);
+            }
+        }
+
+        // Mind Map Functions
+        function setupMindMap() {
+            // Initialize mind map functionality
+        }
+
+        function loadMindMap() {
+            if (!state.currentNoteId) {
+                mindMapContainer.innerHTML = '<p class="empty-state">No note selected. Create or select a note to create a mind map.</p>';
+                return;
+            }
+            
+            // Check if we already have a mind map for this note
+            let mindMap = state.mindMaps.find(m => m.noteId === state.currentNoteId);
+            
+            if (!mindMap) {
+                // Create a new mind map
+                mindMap = {
+                    id: generateId(),
+                    noteId: state.currentNoteId,
+                    nodes: [
+                        {
+                            id: generateId(),
+                            content: noteTitle.value || 'Central Idea',
+                            x: mindMapContainer.offsetWidth / 2 - 60,
+                            y: mindMapContainer.offsetHeight / 2 - 30
+                        }
+                    ],
+                    connections: []
+                };
+                state.mindMaps.push(mindMap);
+                saveState();
+            }
+            
+            state.currentMindMap = mindMap;
+            renderMindMap();
+        }
+
+        function renderMindMap() {
+            if (!state.currentMindMap) return;
+            
+            mindMapContainer.innerHTML = '';
+            
+            // Render connections
+            state.currentMindMap.connections.forEach(connection => {
+                const fromNode = state.currentMindMap.nodes.find(n => n.id === connection.from);
+                const toNode = state.currentMindMap.nodes.find(n => n.id === connection.to);
+                
+                if (fromNode && toNode) {
+                    const connectionEl = document.createElement('div');
+                    connectionEl.className = 'mind-map-connection';
+                    
+                    const dx = toNode.x - fromNode.x;
+                    const dy = toNode.y - fromNode.y;
+                    const length = Math.sqrt(dx * dx + dy * dy);
+                    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                    
+                    connectionEl.style.width = `${length}px`;
+                    connectionEl.style.transform = `rotate(${angle}deg)`;
+                    connectionEl.style.left = `${fromNode.x + 60}px`;
+                    connectionEl.style.top = `${fromNode.y + 30}px`;
+                    
+                    mindMapContainer.appendChild(connectionEl);
+                }
+            });
+            
+            // Render nodes
+            state.currentMindMap.nodes.forEach(node => {
+                const nodeEl = document.createElement('div');
+                nodeEl.className = 'mind-map-node';
+                nodeEl.style.left = `${node.x}px`;
+                nodeEl.style.top = `${node.y}px`;
+                nodeEl.setAttribute('data-node-id', node.id);
+                
+                nodeEl.innerHTML = `
+                    <div class="node-content" contenteditable="true">${node.content}</div>
+                    <div class="node-actions">
+                        <button class="btn btn-secondary add-child-node" data-node-id="${node.id}">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button class="btn btn-secondary delete-node" data-node-id="${node.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                // Make node draggable
+                makeNodeDraggable(nodeEl, node);
+                
+                // Add event listeners
+                nodeEl.querySelector('.node-content').addEventListener('blur', (e) => {
+                    node.content = e.target.textContent;
+                    saveState();
+                });
+                
+                nodeEl.querySelector('.add-child-node').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    addChildNode(node.id);
+                });
+                
+                nodeEl.querySelector('.delete-node').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteNode(node.id);
+                });
+                
+                mindMapContainer.appendChild(nodeEl);
+            });
+        }
+
+        function makeNodeDraggable(nodeEl, node) {
+            let isDragging = false;
+            let startX, startY, initialX, initialY;
+            
+            nodeEl.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('node-content') || 
+                    e.target.classList.contains('add-child-node') || 
+                    e.target.classList.contains('delete-node')) {
+                    return;
+                }
+                
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialX = node.x;
+                initialY = node.y;
+                
+                nodeEl.classList.add('active');
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
+            
+            function onMouseMove(e) {
+                if (!isDragging) return;
+                
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                
+                node.x = initialX + dx;
+                node.y = initialY + dy;
+                
+                nodeEl.style.left = `${node.x}px`;
+                nodeEl.style.top = `${node.y}px`;
+                
+                // Re-render connections
+                renderMindMap();
+            }
+            
+            function onMouseUp() {
+                isDragging = false;
+                nodeEl.classList.remove('active');
+                
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+                
+                saveState();
+            }
+        }
+
+        function addChildNode(parentId) {
+            const parentNode = state.currentMindMap.nodes.find(n => n.id === parentId);
+            if (!parentNode) return;
+            
+            const newNode = {
+                id: generateId(),
+                content: 'New Idea',
+                x: parentNode.x + 200,
+                y: parentNode.y
+            };
+            
+            state.currentMindMap.nodes.push(newNode);
+            state.currentMindMap.connections.push({
+                from: parentId,
+                to: newNode.id
+            });
+            
+            saveState();
+            renderMindMap();
+        }
+
+        function deleteNode(nodeId) {
+            if (state.currentMindMap.nodes.length <= 1) {
+                showToast('Cannot delete the last node', 'error');
+                return;
+            }
+            
+            state.currentMindMap.nodes = state.currentMindMap.nodes.filter(n => n.id !== nodeId);
+            state.currentMindMap.connections = state.currentMindMap.connections.filter(c => 
+                c.from !== nodeId && c.to !== nodeId
+            );
+            
+            saveState();
+            renderMindMap();
+        }
+
+        // Note Sharing Functions
+        function copyNoteToClipboard() {
+            if (!state.currentNoteId) {
+                showToast('Please select or create a note first', 'error');
+                return;
+            }
+            
+            const note = state.notes.find(n => n.id === state.currentNoteId);
+            if (note) {
+                const noteText = `${note.title}\n\n${stripHtml(note.content)}`;
+                
+                // Use the Clipboard API if available
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(noteText)
+                        .then(() => {
+                            showToast('Note copied to clipboard!');
+                        })
+                        .catch(err => {
+                            console.error('Failed to copy note: ', err);
+                            fallbackCopyToClipboard(noteText);
+                        });
+                } else {
+                    fallbackCopyToClipboard(noteText);
+                }
+            }
+        }
+
+        function stripHtml(html) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || '';
+        }
+
+        function summarizeNote() {
+            if (!state.currentNoteId) {
+                showToast('Please select or create a note first', 'error');
+                return;
+            }
+            
+            const note = state.notes.find(n => n.id === state.currentNoteId);
+            if (note) {
+                // Simple summarization - in a real app, this would use an AI API
+                const content = stripHtml(note.content);
+                const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
+                
+                // Take first 3 sentences or all if less than 3
+                const summary = sentences.slice(0, 3).join('. ') + '.';
+                
+                // Create a summary note
+                const summaryNote = {
+                    id: generateId(),
+                    title: `Summary: ${note.title}`,
+                    content: `<p>${summary}</p>`,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                
+                state.notes.push(summaryNote);
+                saveState();
+                renderNotes();
+                
+                showToast('Note summarized successfully! A new summary note has been created.');
             }
         }
 
@@ -4373,6 +5236,11 @@
                 // Update read-only view if in view mode
                 if (state.notesViewMode === 'view') {
                     updateNotesReadonlyView();
+                }
+                
+                // Update mind map if in mind map mode
+                if (state.notesViewMode === 'mindmap') {
+                    loadMindMap();
                 }
             }
         }
