@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyQuest - Your Gamified Productivity Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="StudyQuest.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="StudyQuest.png" sizes="512x512">
+    <link rel="apple-touch-icon" href="StudyQuest.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Environment Effects -->
+    <div class="environment-effects" id="environment-effects"></div>
+
+    <!-- Focus Emoji -->
+    <div class="focus-emoji-container" id="focus-emoji-container">
+        <div class="focus-emoji" id="focus-emoji">🐉</div>
+        <div class="emoji-message" id="emoji-message"></div>
+        <div class="emoji-power-up-indicator" id="emoji-power-up-indicator">⚡</div>
+        <div class="emoji-evolution" id="emoji-evolution">Lv. 1</div>
+    </div>
+
+    <!-- Study Buddy -->
+    <div class="study-buddy-container" id="study-buddy-container">
+        <div class="study-buddy" id="study-buddy">👨‍🎓</div>
+        <div class="buddy-message" id="buddy-message"></div>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-dragon"></i></div>
+                <div class="logo-text">StudyQuest</div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-section="dashboard">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="timetable">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Timetable</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="tasks">
+                        <i class="fas fa-tasks"></i>
+                        <span>Tasks</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="notes">
+                        <i class="fas fa-sticky-note"></i>
+                        <span>Notes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="calendar">
+                        <i class="fas fa-calendar"></i>
+                        <span>Calendar</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="timer">
+                        <i class="fas fa-clock"></i>
+                        <span>Pomodoro Timer</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="subjects">
+                        <i class="fas fa-book"></i>
+                        <span>Subjects</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="resources">
+                        <i class="fas fa-link"></i>
+                        <span>Resources</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="progress">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Progress</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="achievements">
+                        <i class="fas fa-trophy"></i>
+                        <span>Achievements</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="backup">
+                        <i class="fas fa-download"></i>
+                        <span>Backup & Restore</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="user-profile">
+                <div class="user-avatar" id="user-avatar">JS</div>
+                <div class="user-info">
+                    <h3 id="user-name">John Student</h3>
+                    <p>Level <span id="user-level">1</span> Scholar</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section active">
+                <div class="header">
+                    <h1 class="page-title">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </h1>
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-icon xp-icon">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="xp-count">0</h3>
+                                <p>Total XP</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon streak-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="streak-count">0</h3>
+                                <p>Day Streak</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon level-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="level-count">1</h3>
+                                <p>Current Level</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <!-- Timetable Widget -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h2 class="widget-title">
+                                <i class="fas fa-calendar-alt"></i>
+                                Today's Schedule
+                            </h2>
+                            <a href="#" class="nav-link view-all" data-section="timetable">
+                                View All
+                            </a>
+                        </div>
+                        <div class="widget-content">
+                            <div id="today-schedule">
+                                <p class="empty-state">No classes scheduled for today. Add some in the Timetable!</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tasks Widget -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h2 class="widget-title">
+                                <i class="fas fa-tasks"></i>
+                                Upcoming Tasks
+                            </h2>
+                            <a href="#" class="nav-link view-all" data-section="tasks">
+                                View All
+                            </a>
+                        </div>
+                        <div class="widget-content">
+                            <ul class="task-list" id="dashboard-tasks">
+                                <li class="empty-state">No upcoming tasks. Add a task to get started!</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Pomodoro Widget -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h2 class="widget-title">
+                                <i class="fas fa-clock"></i>
+                                Pomodoro Timer
+                            </h2>
+                        </div>
+                        <div class="widget-content">
+                            <div class="timer-preview">
+                                <div class="circular-progress">
+                                    <svg>
+                                        <circle class="circular-bg" cx="40" cy="40" r="36"></circle>
+                                        <circle class="circular-fill" cx="40" cy="40" r="36"></circle>
+                                    </svg>
+                                    <div class="circular-text">
+                                        <div id="timer-preview-display">25:00</div>
+                                    </div>
+                                </div>
+                                <div style="text-align: center; margin-top: 15px;">
+                                    <button class="btn btn-primary" id="start-timer-from-dashboard">
+                                        <i class="fas fa-play"></i> Start Focus
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress Widget -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h2 class="widget-title">
+                                <i class="fas fa-chart-line"></i>
+                                Weekly Progress
+                            </h2>
+                        </div>
+                        <div class="widget-content">
+                            <div class="progress-container">
+                                <div class="progress-label">
+                                    <span>XP Progress</span>
+                                    <span id="xp-progress-text">0/500</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="xp-progress-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div style="text-align: center; margin-top: 20px;">
+                                <canvas id="weeklyChart" height="120"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Study Challenges -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <h2 class="widget-title">
+                            <i class="fas fa-flag"></i>
+                            Daily Study Challenges
+                        </h2>
+                    </div>
+                    <div class="widget-content">
+                        <div class="study-challenges" id="study-challenges">
+                            <div class="empty-state">Complete tasks and study sessions to unlock challenges!</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Smart Reminders -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <h2 class="widget-title">
+                            <i class="fas fa-bell"></i>
+                            Smart Reminders
+                        </h2>
+                    </div>
+                    <div class="widget-content">
+                        <div class="notification-list" id="smart-reminders">
+                            <div class="empty-state">Complete tasks and study sessions to get personalized reminders!</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notifications -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <h2 class="widget-title">
+                            <i class="fas fa-bell"></i>
+                            Notifications
+                        </h2>
+                    </div>
+                    <div class="widget-content">
+                        <div class="notification-list" id="notification-list">
+                            <div class="empty-state">No notifications yet. Complete tasks to earn achievements!</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Timetable Section -->
+            <section id="timetable" class="section">
+                <div class="header">
+                    <h1 class="page-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Weekly Timetable
+                    </h1>
+                    <button class="btn btn-primary" id="add-class-btn">
+                        <i class="fas fa-plus"></i> Add Class
+                    </button>
+                </div>
+                
+                <div class="widget">
+                    <div class="widget-content">
+                        <div class="timetable" id="timetable-grid"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Tasks Section -->
+            <section id="tasks" class="section">
+                <div class="header">
+                    <h1 class="page-title">
+                        <i class="fas fa-tasks"></i>
+                        Task Manager
+                    </h1>
+                    <div>
+                        <button class="btn btn-primary" id="add-task-btn">
+                            <i class="fas fa-plus"></i> Add Task
+                        </button>
+                        <button class="btn btn-secondary" id="auto-delete-completed-btn">
+                            <i class="fas fa-trash"></i> Auto-Delete Completed
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="widget">
+                    <div class="widget-content">
+                        <ul class="task-list" id="task-list">
+                            <li class="empty-state">No tasks yet. Add your first task to get started!</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Notes Section -->
+            <section id="notes" class="section">
+                <div class="header">
+                    <h1 class="page-title">
+                        <i class="fas fa-sticky-note"></i>
+                        Notes
+                    </h1>
+                    <button class="btn btn-primary" id="add-note-btn">
+                        <i class="fas fa-plus"></i> Add Note
+                    </button>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h2 class="widget-title">
+                                <i class="fas fa-list"></i>
+                                My Notes
+                            </h2>
+                        </div>
+                        <div class="widget-content">
+                            <div class="notes-list" id="notes-list">
+                                <div class="empty-state">No notes yet. Create your first note!</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h2 class="widget-title">
+                                <i class="fas fa-edit"></i>
+                                Note Editor
+                            </h2>
+                        </div>
+                        <div class="widget-content">
+                            <!-- Quick Note Templates -->
+                            <div class="quick-templates">
+                                <button class="template-btn" data-template="lecture">Lecture Notes</button>
+                                <button class="template-btn" data-template="book">Book Summary</button>
+                                <button class="template-btn" data-template="meeting">Meeting Notes</button>
+                                <button class="template-btn" data-template="code">Code Snippet</button>
+                            </div>
+                            
+                            <!-- Session Quick Resume -->
+                            <div class="session-resume" id="session-resume" style="display: none;">
+                                <h3><i class="fas fa-history"></i> Continue Previous Session</h3>
+                                <p id="resume-session-info">You have an unfinished session from earlier.</p>
+                                <button class="btn btn-primary" id="resume-session-btn">
+                                    <i class="fas fa-play"></i> Resume Session
+                                </button>
+                            </div>
+                            
+                            <div class="notes-view-mode">
+                                <button class="view-mode-btn active" id="edit-mode-btn">
+                                    <i class="fas fa-edit"></i> Edit Mode
+                                </button>
+                                <button class="view-mode-btn" id="view-mode-btn">
+                                    <i class="fas fa-eye"></i> View Mode
+                                </button>
+                                <button class="view-mode-btn" id="mind-map-mode-btn">
+                                    <i class="fas fa-project-diagram"></i> Mind Map
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="note-title" placeholder="Note Title">
+                            </div>
+                            <div id="editor"></div>
+                            <div id="notes-readonly" class="notes-readonly" style="display: none;"></div>
+                            <div id="mind-map-container" class="mind-map-container" style="display: none;"></div>
+                            <div class="note-sharing-options">
+                                <button class="btn btn-secondary" id="copy-note-btn">
+                                    <i class="fas fa-copy"></i> Copy Note
+                                </button>
+                                <button class="btn btn-secondary" id="summarize-note-btn">
+                                    <i class="fas fa-file-alt"></i> Summarize
+                                </button>
+                            </div>
+                            <div class="form-group" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button class="btn btn-primary" id="save-note-btn">
+                                    <i class="fas fa-save"></i> Save Note
+                                </button>
+                                <button class="btn btn-secondary" id="new-note-btn">
+                                    <i class="fas fa-file"></i> New Note
+                                </button>
+                                <button class="btn btn-secondary" id="export-note-btn">
+                                    <i class="fas fa-file-pdf"></i> Export as PDF
+                                </button>
+                                <button class="btn btn-secondary" id="delete-note-btn">
+                                    <i class="fas fa-trash"></i> Delete Note
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Calendar Section -->
+            <section id="calendar" class="section">
+                <div class="header">
+                    <h1 class="page-title">
+                        <i class="fas fa-calendar"></i>
+                        Calendar
+                    </h1>
+                    <button class="btn btn-primary" id="add-event-btn">
+                        <i class="fas fa-plus"></i> Add Event
+                    </button>
+                </div>
+                
+                <div class="widget">
+                    <div class="widget-header">
+                        <h2 class="widget-title">
+                            <i class="fas fa-calendar"></i>
+                            <span id="calendar-month-year">October 2023</span>
+                        </h2>
+                        <div>
+                            <button class="btn btn-secondary" id="prev-month">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="btn btn-secondary" id="next-month">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="widget-content">
+                        <div class="calendar" id="calendar-grid"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Timer Section -->
+            <section id="timer" class="section">
+                <div class="header">
+                    <h1 class="page-title">
+                        <i class="fas fa-clock"></i>
+                        Pomodoro Timer
+                    </h1>
+                </div>
+                
+                <div class="widget">
+                    <div class="widget-content">
+                        <!-- Seasonal Theme Indicator -->
+                        <div class="seasonal-theme" id="seasonal-theme" style="display: none;">
+                            <div id="seasonal-icon">🎃</div>
+                            <div id="seasonal-message">Halloween Theme Active! Spooky studying!</div>
+                        </div>
+                        
+                        <!-- Quick Mood Check-in -->
+                        <div class="mood-checkin">
+                            <div class="mood-btn" data-mood="happy">😊</div>
+                            <div class="mood-btn" data-mood="neutral">😐</div>
+                            <div class="mood-btn" data-mood="sad">😔</div>
+                            <div class="mood-btn" data-mood="tired">😴</div>
+                            <div class="mood-btn" data-mood="focused">🧠</div>
+                        </div>
+                        
+                        <!-- Quick Session Templates -->
+                        <div class="session-templates">
+                            <div class="session-template" data-template="last">
+                                <h3><i class="fas fa-history"></i> Last Session</h3>
+                                <p>Resume your previous study setup</p>
+                            </div>
+                            <div class="session-template" data-template="energy">
+                                <h3><i class="fas fa-bolt"></i> Energy Boost</h3>
+                                <p>Short, high-intensity focus bursts</p>
+                            </div>
+                            <div class="session-template" data-template="deep">
+                                <h3><i class="fas fa-brain"></i> Deep Work</h3>
+                                <p>Extended focus with longer breaks</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Study Session Naming -->
+                        <div class="session-naming">
+                            <div class="session-name" id="session-name-1">Quantum Quest</div>
+                            <div class="session-name" id="session-name-2">Code Crusade</div>
+                            <div class="session-name" id="session-name-3">History Hunt</div>
+                            <button class="btn btn-secondary" id="generate-session-name">
+                                <i class="fas fa-random"></i> New Name
+                            </button>
+                        </div>
+                        
+                        <div class="timer-container">
+                            <div class="timer-display" id="timer-display">25:00</div>
+                            <div class="timer-controls">
+                                <button class="timer-btn start" id="start-timer">
+                                    <i class="fas fa-play"></i> Start
+                                </button>
+                                <button class="timer-btn pause" id="pause-timer">
+                                    <i class="fas fa-pause"></i> Pause
+                                </button>
+                                <button class="timer-btn reset" id="reset-timer">
+                                    <i class="fas fa-redo"></i> Reset
+                                </button>
+                            </div>
+                            <div class="timer-mode">
+                                <button class="mode-btn active" data-minutes="25">Focus (25m)</button>
+                                <button class="mode-btn" data-minutes="5">Short Break (5m)</button>
+                                <button class="mode-btn" data-minutes="15">Long Break (15m)</button>
+                            </div>
+                            <div class="timer-extras">
+                                <button class="btn btn-secondary" id="skip-break-btn">
+                                    <i class="fas fa-forward"></i> Skip Break
+                                </button>
+                                <button class="btn btn-secondary" id="extend-session-btn">
+                                    <i class="fas fa-plus-circle"></i> Extend 15min
+                                </button>
+                            </div>
+                            <div class="progress-container" style="margin-top: 30px;">
+                                <div class="progress-label">
+                                    <span>Sessions Completed Today</span>
+                                    <span id="sessions-count">0</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="sessions-progress" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Study Story Creator -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <h2 class="widget-title">
+                            <i class="fas fa-book-open"></i>
+                            Study Story Creator
+                        </h2>
+                    </div>
+                    <div class="widget-content">
+                        <div class="story-creator">
+                            <div class="form-group">
+                                <label class="form-label" for="story-topic">What do you want to learn about?</label>
+                                <input type="text" class="form-control" id="story-topic" placeholder="Enter a topic (e.g., Photosynthesis, World War II, JavaScript Functions)">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="story-style">Story Style</label>
+                                <select class="form-control" id="story-style">
+                                    <option value="adventure">Adventure Story</option>
+                                    <option value="mystery">Mystery</option>
+                                    <option value="scifi">Sci-Fi Adventure</option>
+                                    <option value="fantasy">Fantasy Quest</option>
+                                    <option value="detective">Detective Story</option>
+                                    <option value="superhero">Superhero Adventure</option>
+                                    <option value="historical">Historical</option>
+                                    <option value="scientific">Scientific</option>
+                                    <option value="biographical">Biographical</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="story-character">Main Character</label>
+                                <input type="text" class="form-control" id="story-character" placeholder="Enter character name (optional)" value="You">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="story-length">Story Length</label>
+                                <select class="form-control" id="story-length">
+                                    <option value="short">Short (1-2 paragraphs)</option>
+                                    <option value="medium" selected>Medium (3-4 paragraphs)</option>
+                                    <option value="long">Long (5+ paragraphs)</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" id="generate-story-btn">
+                                <i class="fas fa-magic"></i> Create Learning Story
+                            </button>
+                            
+                            <div id="story-output" style="margin-top: 20px; display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Interactive Whiteboard -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <h2 class="widget-title">
+                            <i class="fas fa-palette"></i>
+                            Interactive Whiteboard
+                        </h2>
+                    </div>
+                    <div class="widget-content">
+                        <div class="whiteboard-toolbar">
+                            <div class="whiteboard-tools">
+                                <button class="whiteboard-tool active" data-tool="pen">
+                                    <i class="fas fa-pen"></i> Pen
+                                </button>
+                                <button class="whiteboard-tool" data-tool="eraser">
+                                    <i class="fas fa-eraser"></i> Eraser
+                                </button>
+                                <button class="whiteboard-tool" data-tool="rectangle">
+                                    <i class="fas fa-square"></i> Rectangle
+                                </button>
+                                <button class="whiteboard-tool" data-tool="circle">
+                                    <i class="fas fa-circle"></i> Circle
+                                </button>
+                                <button class="whiteboard-tool" data-tool="line">
+                                    <i class="fas fa-minus"></i> Line
+                                </button>
+                                <button class="whiteboard-tool" data-tool="text">
+                                    <i class="fas fa-font"></i> Text
+                                </button>
+                            </div>
+                            
+                            <div class="brush-size-selector">
+                                <div class="brush-size small active" data-size="2"></div>
+                                <div class="brush-size medium" data-size="5"></div>
+                                <div class="brush-size large" data-size="10"></div>
+                            </div>
+                            
+                            <div class="color-palette">
+                                <div class="color-option active" style="background-color: #e94560;" data-color="#e94560"></div>
+                                <div class="color-option" style="background-color: #4cd97b;" data-color="#4cd97b"></div>
+                                <div class="color-option" style="background-color: #ffc107;" data-color="#ffc107"></div>
+                                <div class="color-option" style="background-color: #17a2b8;" data-color="#17a2b8"></div>
+                                <div class="color-option" style="background-color: #6f42c1;" data-color="#6f42c1"></div>
+                                <div class="color-option" style="background-color: #000000;" data-color="#000000"></div>
+                            </div>
+                            
+                            <div class="whiteboard-history">
+                                <button class="whiteboard-tool" id="undo-whiteboard">
+                                    <i class="fas fa-undo"></i> Undo
+                                </button>
+                                <button class="whiteboard-tool" id="redo-whiteboard">
+                                    <i class="fas fa-redo"></i> Redo
+                                </button>
+                            </div>
+                            
+                            <button class="whiteboard-tool" id="clear-whiteboard">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                            <button class="whiteboard-tool" id="save-whiteboard">
+                                <i class="fas fa-save"></i> Save
+                            </button>
+                        </div>
+                        <div class="whiteboard-container" id="whiteboard">
+                            <canvas id="whiteboard-canvas"></canvas>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 12px; color: var(--text-muted);">
+                            <i class="fas fa-info-circle"></i> Click and drag to draw. Use the eraser to remove parts.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Study Quests -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <h2 class="widget-title">
+                            <i class="fas fa-quest"></i>
+                            Study Quests
+                        </h2>
+                    </div>
+                    <div class="widget-content">
+                        <div class="study-quests">
+                            <div class="quest-card" data-quest="researcher">
+                                <div class="quest-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <h3>Researcher</h3>
+                                <p>Gather information and analyze data</p>
+                                <div class="quest-ability">Ability: +25% XP from notes</div>
+                            </div>
+                            <div class="quest-card" data-quest="analyst">
+                                <div class="quest-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <h3>Analyst</h3>
+                                <p>Break down complex problems</p>
+                                <div class="quest-ability">Ability: Unlock advanced insights</div>
+                            </div>
+                            <div class="quest-card" data-quest="creator">
+                                <div class="quest-icon">
+                                    <i class="fas fa-paint-brush"></i>
+                                </div>
+                                <h3>Creator</h3>
+                                <p>Build and design new solutions</p>
+                                <div class="quest-ability">Ability: Enhanced whiteboard tools</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-primary" id="select-quest-btn">
+                                <i class="fas fa-check"></i> Select Quest
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Subjects Section -->
+            <section id="subjects" class="section">
+                <div class="header">
+                    <h1 class="page-title">
+                        <i class="fas fa-book"></i>
+                        Subjects
+                    </h1>
+                    <button class="btn btn-primary" id="add-subject-btn">
+                        <i class="fas fa-plus"></i> Add Subject
+                    </button>
+                </div>
+                
+                <div class="dashboard-grid" id="subjects-grid">
+                    <div class="empty-state">No subjects added yet. Add your first subject!</div>
+                </div>
+            </section>
+            
+            <!-- Resources Section -->
+            <section id="resources" class="section">
+                <div class="header">
+                    <h1 class="page-title">
+                        <i class="fas fa-link"></i>
+                        Resource Manager
+                    </h1>
+                    <button class="btn btn-primary" id="add-resource-btn">
+                        <i class="fas fa-plus"></i> Add Resource
+                    </button>
+                </div>
+                
+                <div class="widget">
+                    <div class="widget-content">
+                        <div id="resources-container">
+                            <div class="empty-state">No resources added yet. Add your first resource!</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Progress Section -->
+            <section id="progress" class="section">
+                <div class="header">
+                    <h1 class="page-title">
+                        <i class="fas fa-chart-line"></i>
+                        Progress Tracking
+                    </h1>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h2 class="widget-title">
+                                <i class="fas fa-chart-bar"></i>
+                                Study Time by Subject
+                            </h2>
+                        </div>
+                        <div class="widget-content">
+                            <canvas id="subjectChart" height="250"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h2 class="widget-title">
+                                <i class="fas fa-chart-line"></i>
+                                Weekly Study Trend
+                            </h2>
+                        </div>
+                        <div class="widget-content">
+                            <canvas id="weeklyTrendChart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Study Time Predictions -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <h2 class="widget-title">
+                            <i class="fas fa-hourglass-half"></i>
+                            Study Time Predictions
+                        </h2>
+                    </div>
+                    <div class="widget-content">
+                        <div id="study-predictions">
+                            <div class="empty-state">Complete more study sessions to get personalized predictions!</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Achievements Section -->
+            <section id="achievements" class="section">
+                <div class="header">
+                    <h1 class="page-title">
+                        <i class="fas fa-trophy"></i>
+                        Achievements
+                    </h1>
+                </div>
+                
+                <div class="widget">
+                    <div class="widget-content">
+                        <div class="achievements-grid" id="achievements-grid"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Backup & Restore Section -->
+            <section id="backup" class="section">
+                <div class="header">
+                    <h1 class="page-title">
+                        <i class="fas fa-download"></i>
+                        Backup & Restore
+                    </h1>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h2 class="widget-title">
+                                <i class="fas fa-download"></i>
+                                Backup Data
+                            </h2>
+                        </div>
+                        <div class="widget-content">
+                            <p>Create a backup of all your StudyQuest data. This will download a JSON file that you can use to restore your data later.</p>
+                            <div class="backup-actions">
+                                <button class="btn btn-primary" id="backup-data-btn">
+                                    <i class="fas fa-file-export"></i> Export Backup
+                                </button>
+                                <button class="btn btn-secondary" id="copy-data-btn">
+                                    <i class="fas fa-copy"></i> Copy Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h2 class="widget-title">
+                                <i class="fas fa-upload"></i>
+                                Restore Data
+                            </h2>
+                        </div>
+                        <div class="widget-content">
+                            <p>Restore your StudyQuest data from a previously created backup file.</p>
+                            <div class="form-group">
+                                <label class="form-label" for="restore-file">Select Backup File</label>
+                                <input type="file" class="form-control" id="restore-file" accept=".json">
+                            </div>
+                            <div class="backup-actions">
+                                <button class="btn btn-primary" id="restore-data-btn">
+                                    <i class="fas fa-file-import"></i> Restore Backup
+                                </button>
+                            </div>
+                            <div class="alert alert-warning" style="margin-top: 15px; padding: 10px; background: rgba(255, 193, 7, 0.1); border-radius: 8px; border-left: 4px solid var(--warning);">
+                                <strong>Warning:</strong> Restoring data will overwrite all your current data. This action cannot be undone.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Settings Section -->
+            <section id="settings" class="section">
+                <div class="header">
+                    <h1 class="page-title">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </h1>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h2 class="widget-title">
+                                <i class="fas fa-user"></i>
+                                Profile Settings
+                            </h2>
+                        </div>
+                        <div class="widget-content">
+                            <div class="form-group">
+                                <label class="form-label" for="settings-username">Username</label>
+                                <input type="text" class="form-control" id="settings-username" placeholder="Enter your username">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="study-space-name">Study Space Name</label>
+                                <input type="text" class="form-control" id="study-space-name" placeholder="e.g., Sarah's Study Cave">
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" id="save-profile-btn">
+                                    <i class="fas fa-save"></i> Save Profile
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h2 class="widget-title">
+                                <i class="fas fa-palette"></i>
+                                Theme Settings
+                            </h2>
+                        </div>
+                        <div class="widget-content">
+                            <p>Choose your preferred theme for StudyQuest:</p>
+                            <div class="theme-toggle">
+                                <div class="theme-option active" data-theme="dark">
+                                    <div class="theme-preview dark"></div>
+                                    <span>Dark Theme</span>
+                                </div>
+                                <div class="theme-option" data-theme="light">
+                                    <div class="theme-preview light"></div>
+                                    <span>Light Theme</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h2 class="widget-title">
+                                <i class="fas fa-smile"></i>
+                                Personalization
+                            </h2>
+                        </div>
+                        <div class="widget-content">
+                            <p>Choose your focus emoji/mascot:</p>
+                            <div class="personalization-options" id="focus-emojis">
+                                <div class="personalization-option active" data-emoji="🐉">
+                                    <div class="personalization-icon">🐉</div>
+                                    <div class="personalization-name">Dragon</div>
+                                    <div class="personalization-desc">Powerful & focused</div>
+                                </div>
+                                <div class="personalization-option" data-emoji="🦉">
+                                    <div class="personalization-icon">🦉</div>
+                                    <div class="personalization-name">Owl</div>
+                                    <div class="personalization-desc">Wise & attentive</div>
+                                </div>
+                                <div class="personalization-option" data-emoji="🚀">
+                                    <div class="personalization-icon">🚀</div>
+                                    <div class="personalization-name">Rocket</div>
+                                    <div class="personalization-desc">Fast & efficient</div>
+                                </div>
+                                <div class="personalization-option" data-emoji="🧠">
+                                    <div class="personalization-icon">🧠</div>
+                                    <div class="personalization-name">Brain</div>
+                                    <div class="personalization-desc">Smart & analytical</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 20px;">
+                                <p>Custom study session names:</p>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="custom-session-name-1" placeholder="e.g., Crunch Time" value="Crunch Time">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="custom-session-name-2" placeholder="e.g., Deep Work" value="Deep Work">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="custom-session-name-3" placeholder="e.g., Focus Burst" value="Focus Burst">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Environment Settings -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h2 class="widget-title">
+                                <i class="fas fa-cloud"></i>
+                                Study Environment
+                            </h2>
+                        </div>
+                        <div class="widget-content">
+                            <p>Choose your preferred study environment:</p>
+                            <div class="environment-selector" id="environment-selector">
+                                <div class="environment-option active" data-environment="clear">
+                                    <div class="environment-icon">☀️</div>
+                                    <div class="environment-name">Clear Day</div>
+                                    <div class="environment-desc">Bright and focused</div>
+                                </div>
+                                <div class="environment-option" data-environment="night">
+                                    <div class="environment-icon">🌙</div>
+                                    <div class="environment-name">Night</div>
+                                    <div class="environment-desc">Calm and peaceful</div>
+                                </div>
+                                <div class="environment-option" data-environment="rain">
+                                    <div class="environment-icon">🌧️</div>
+                                    <div class="environment-name">Rain</div>
+                                    <div class="environment-desc">Cozy and relaxing</div>
+                                </div>
+                                <div class="environment-option" data-environment="snow">
+                                    <div class="environment-icon">❄️</div>
+                                    <div class="environment-name">Snow</div>
+                                    <div class="environment-desc">Quiet and serene</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Background Settings -->
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h2 class="widget-title">
+                                <i class="fas fa-image"></i>
+                                Background Settings
+                            </h2>
+                        </div>
+                        <div class="widget-content">
+                            <p>Choose your preferred background:</p>
+                            <div class="background-selector" id="background-selector">
+                                <div class="background-option active" data-background="default" style="background: linear-gradient(135deg, #1a1a2e, #16213e);">
+                                    <div class="background-name">Default</div>
+                                </div>
+                                <div class="background-option" data-background="space" style="background: linear-gradient(135deg, #0a0a1a, #1a1a2e);">
+                                    <div class="background-name">Space</div>
+                                </div>
+                                <div class="background-option" data-background="forest" style="background: linear-gradient(135deg, #1a3a1a, #2d5a2d);">
+                                    <div class="background-name">Forest</div>
+                                </div>
+                                <div class="background-option" data-background="beach" style="background: linear-gradient(135deg, #1a5a7a, #2d7a9a);">
+                                    <div class="background-name">Beach</div>
+                                </div>
+                                <div class="background-option" data-background="library" style="background: linear-gradient(135deg, #3a2a1a, #5a4a2d);">
+                                    <div class="background-name">Library</div>
+                                </div>
+                                <div class="background-option" data-background="gradient" style="background: linear-gradient(135deg, #6a0dad, #ff6b6b);">
+                                    <div class="background-name">Gradient</div>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label class="form-label" for="custom-background">Custom Background (URL)</label>
+                                <input type="url" class="form-control" id="custom-background" placeholder="https://example.com/background.jpg">
+                                <button class="btn btn-secondary" id="apply-custom-background" style="margin-top: 10px;">
+                                    <i class="fas fa-check"></i> Apply Custom Background
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <!-- Class Modal -->
+    <div class="modal" id="class-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="class-modal-title">Add Class</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="class-form">
+                <input type="hidden" id="edit-class-id">
+                <div class="form-group">
+                    <label class="form-label" for="class-subject">Subject</label>
+                    <input type="text" class="form-control" id="class-subject" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="class-topic">Topic</label>
+                    <input type="text" class="form-control" id="class-topic">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="class-color">Color</label>
+                    <input type="color" class="form-control" id="class-color" value="#e94560">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="class-day">Day</label>
+                    <select class="form-control" id="class-day" required>
+                        <option value="1">Monday</option>
+                        <option value="2">Tuesday</option>
+                        <option value="3">Wednesday</option>
+                        <option value="4">Thursday</option>
+                        <option value="5">Friday</option>
+                        <option value="6">Saturday</option>
+                        <option value="7">Sunday</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="class-time">Time</label>
+                    <select class="form-control" id="class-time" required>
+                        <option value="8">8:00 AM</option>
+                        <option value="9">9:00 AM</option>
+                        <option value="10">10:00 AM</option>
+                        <option value="11">11:00 AM</option>
+                        <option value="12">12:00 PM</option>
+                        <option value="13">1:00 PM</option>
+                        <option value="14">2:00 PM</option>
+                        <option value="15">3:00 PM</option>
+                        <option value="16">4:00 PM</option>
+                        <option value="17">5:00 PM</option>
+                    </select>
+                </div>
+                <div class="form-group" style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;" id="save-class-btn">Save Class</button>
+                    <button type="button" class="btn btn-secondary" id="delete-class-btn" style="flex: 1;">Delete Class</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Task Modal -->
+    <div class="modal" id="task-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="task-modal-title">Add Task</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="task-form">
+                <input type="hidden" id="edit-task-id">
+                <div class="form-group">
+                    <label class="form-label" for="task-title">Title</label>
+                    <input type="text" class="form-control" id="task-title" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="task-description">Description</label>
+                    <textarea class="form-control" id="task-description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="task-due">Due Date</label>
+                    <input type="date" class="form-control" id="task-due" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="task-subject">Subject (Optional)</label>
+                    <select class="form-control" id="task-subject">
+                        <option value="">No Subject</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;" id="save-task-btn">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Event Modal -->
+    <div class="modal" id="event-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="event-modal-title">Add Event</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="event-form">
+                <input type="hidden" id="edit-event-id">
+                <div class="form-group">
+                    <label class="form-label" for="event-title">Title</label>
+                    <input type="text" class="form-control" id="event-title" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="event-description">Description</label>
+                    <textarea class="form-control" id="event-description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="event-date">Date</label>
+                    <input type="date" class="form-control" id="event-date" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="event-time">Time</label>
+                    <input type="time" class="form-control" id="event-time">
+                </div>
+                <div class="form-group" style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;" id="save-event-btn">Save Event</button>
+                    <button type="button" class="btn btn-secondary" id="delete-event-btn" style="flex: 1;">Delete Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Subject Modal -->
+    <div class="modal" id="subject-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="subject-modal-title">Add Subject</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="subject-form">
+                <input type="hidden" id="edit-subject-id">
+                <div class="form-group">
+                    <label class="form-label" for="subject-name">Subject Name</label>
+                    <input type="text" class="form-control" id="subject-name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="subject-color">Color</label>
+                    <input type="color" class="form-control" id="subject-color" value="#e94560">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="subject-resources">Resources (one per line)</label>
+                    <textarea class="form-control" id="subject-resources" rows="5" placeholder="Add links to resources like YouTube videos, PDFs, websites..."></textarea>
+                </div>
+                <div class="form-group" style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;" id="save-subject-btn">Save Subject</button>
+                    <button type="button" class="btn btn-secondary" id="delete-subject-btn" style="flex: 1;">Delete Subject</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Resource Modal -->
+    <div class="modal" id="resource-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="resource-modal-title">Add Resource</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="resource-form">
+                <input type="hidden" id="edit-resource-id">
+                <div class="form-group">
+                    <label class="form-label" for="resource-name">Resource Name</label>
+                    <input type="text" class="form-control" id="resource-name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="resource-url">URL</label>
+                    <input type="url" class="form-control" id="resource-url" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="resource-description">Description</label>
+                    <textarea class="form-control" id="resource-description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="resource-category">Category</label>
+                    <select class="form-control" id="resource-category" required>
+                        <option value="pdf">PDF Document</option>
+                        <option value="video">Video</option>
+                        <option value="website">Website</option>
+                        <option value="book">Book</option>
+                        <option value="article">Article</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group" style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;" id="save-resource-btn">Save Resource</button>
+                    <button type="button" class="btn btn-secondary" id="delete-resource-btn" style="flex: 1;">Delete Resource</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
