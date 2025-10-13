@@ -623,76 +623,7 @@
                     </div>
                 </div>
                 
-                <!-- Interactive Whiteboard -->
-                <div class="widget">
-                    <div class="widget-header">
-                        <h2 class="widget-title">
-                            <i class="fas fa-palette"></i>
-                            Interactive Whiteboard
-                        </h2>
-                    </div>
-                    <div class="widget-content">
-                        <div class="whiteboard-toolbar">
-                            <div class="whiteboard-tools">
-                                <button class="whiteboard-tool active" data-tool="pen">
-                                    <i class="fas fa-pen"></i> Pen
-                                </button>
-                                <button class="whiteboard-tool" data-tool="eraser">
-                                    <i class="fas fa-eraser"></i> Eraser
-                                </button>
-                                <button class="whiteboard-tool" data-tool="rectangle">
-                                    <i class="fas fa-square"></i> Rectangle
-                                </button>
-                                <button class="whiteboard-tool" data-tool="circle">
-                                    <i class="fas fa-circle"></i> Circle
-                                </button>
-                                <button class="whiteboard-tool" data-tool="line">
-                                    <i class="fas fa-minus"></i> Line
-                                </button>
-                                <button class="whiteboard-tool" data-tool="text">
-                                    <i class="fas fa-font"></i> Text
-                                </button>
-                            </div>
-                            
-                            <div class="brush-size-selector">
-                                <div class="brush-size small active" data-size="2"></div>
-                                <div class="brush-size medium" data-size="5"></div>
-                                <div class="brush-size large" data-size="10"></div>
-                            </div>
-                            
-                            <div class="color-palette">
-                                <div class="color-option active" style="background-color: #e94560;" data-color="#e94560"></div>
-                                <div class="color-option" style="background-color: #4cd97b;" data-color="#4cd97b"></div>
-                                <div class="color-option" style="background-color: #ffc107;" data-color="#ffc107"></div>
-                                <div class="color-option" style="background-color: #17a2b8;" data-color="#17a2b8"></div>
-                                <div class="color-option" style="background-color: #6f42c1;" data-color="#6f42c1"></div>
-                                <div class="color-option" style="background-color: #000000;" data-color="#000000"></div>
-                            </div>
-                            
-                            <div class="whiteboard-history">
-                                <button class="whiteboard-tool" id="undo-whiteboard">
-                                    <i class="fas fa-undo"></i> Undo
-                                </button>
-                                <button class="whiteboard-tool" id="redo-whiteboard">
-                                    <i class="fas fa-redo"></i> Redo
-                                </button>
-                            </div>
-                            
-                            <button class="whiteboard-tool" id="clear-whiteboard">
-                                <i class="fas fa-trash"></i> Clear
-                            </button>
-                            <button class="whiteboard-tool" id="save-whiteboard">
-                                <i class="fas fa-save"></i> Save
-                            </button>
-                        </div>
-                        <div class="whiteboard-container" id="whiteboard">
-                            <canvas id="whiteboard-canvas"></canvas>
-                        </div>
-                        <div style="margin-top: 10px; font-size: 12px; color: var(--text-muted);">
-                            <i class="fas fa-info-circle"></i> Click and drag to draw. Use the eraser to remove parts.
-                        </div>
-                    </div>
-                </div>
+                
                 
                 <!-- Study Quests -->
                 <div class="widget">
@@ -1275,4 +1206,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>
