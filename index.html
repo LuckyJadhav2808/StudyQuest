@@ -142,7 +142,6 @@
             border-radius: 20px;
             font-size: 14px;
             white-space: nowrap;
-            margin-bottom: 10px;
             opacity: 0;
             transition: opacity 0.3s;
             max-width: 200px;
@@ -1778,6 +1777,117 @@
             color: var(--text-muted);
         }
 
+        /* Enhanced PDF Export Styles */
+.pdf-export-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.pdf-export-btn {
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #e94560, #ff6b81);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.pdf-export-btn:hover {
+    background: linear-gradient(135deg, #d43550, #e55b71);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+}
+
+.pdf-export-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.pdf-export-btn i {
+    font-size: 16px;
+}
+
+.pdf-export-options {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius);
+    flex-wrap: wrap;
+}
+
+.light-theme .pdf-export-options {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.pdf-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.pdf-option input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--accent);
+}
+
+.pdf-option label {
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-light);
+}
+
+.pdf-loading {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius);
+}
+
+.light-theme .pdf-loading {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.pdf-loading.active {
+    display: flex;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--accent);
+    animation: spin 1s ease-in-out infinite;
+}
+
+.light-theme .spinner {
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-top-color: var(--accent);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
       
         .toast {
             position: fixed;
@@ -1896,6 +2006,11 @@
             .personalization-options {
                 grid-template-columns: 1fr;
             }
+            
+            .pdf-export-options {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1938,7 +2053,12 @@
                 height: 30px;
                 font-size: 12px;
             }
+            
+            .pdf-export-container {
+                flex-direction: column;
+            }
         }
+
       
     </style>
 </head>
@@ -2265,101 +2385,134 @@
             </section>
             
             <!-- Notes Section -->
-            <section id="notes" class="section">
-                <div class="header">
-                    <h1 class="page-title">
-                        <i class="fas fa-sticky-note"></i>
-                        Notes
-                    </h1>
-                    <button class="btn btn-primary" id="add-note-btn">
-                        <i class="fas fa-plus"></i> Add Note
+<section id="notes" class="section">
+    <div class="header">
+        <h1 class="page-title">
+            <i class="fas fa-sticky-note"></i>
+            Notes
+        </h1>
+        <button class="btn btn-primary" id="add-note-btn">
+            <i class="fas fa-plus"></i> Add Note
+        </button>
+    </div>
+    
+    <div class="dashboard-grid">
+        <div class="widget">
+            <div class="widget-header">
+                <h2 class="widget-title">
+                    <i class="fas fa-list"></i>
+                    My Notes
+                </h2>
+            </div>
+            <div class="widget-content">
+                <div class="notes-list" id="notes-list">
+                    <!-- Notes will be loaded here -->
+                    <div class="empty-state">No notes yet. Create your first note!</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="widget">
+            <div class="widget-header">
+                <h2 class="widget-title">
+                    <i class="fas fa-edit"></i>
+                    Note Editor
+                </h2>
+            </div>
+            <div class="widget-content">
+                <!-- Quick Note Templates -->
+                <div class="quick-templates">
+                    <button class="template-btn" data-template="lecture">Lecture Notes</button>
+                    <button class="template-btn" data-template="book">Book Summary</button>
+                    <button class="template-btn" data-template="meeting">Meeting Notes</button>
+                    <button class="template-btn" data-template="code">Code Snippet</button>
+                </div>
+                
+                <!-- Session Quick Resume -->
+                <div class="session-resume" id="session-resume" style="display: none;">
+                    <h3><i class="fas fa-history"></i> Continue Previous Session</h3>
+                    <p id="resume-session-info">You have an unfinished session from earlier.</p>
+                    <button class="btn btn-primary" id="resume-session-btn">
+                        <i class="fas fa-play"></i> Resume Session
                     </button>
                 </div>
                 
-                <div class="dashboard-grid">
-                    <div class="widget">
-                        <div class="widget-header">
-                            <h2 class="widget-title">
-                                <i class="fas fa-list"></i>
-                                My Notes
-                            </h2>
-                        </div>
-                        <div class="widget-content">
-                            <div class="notes-list" id="notes-list">
-                               
-                                <div class="empty-state">No notes yet. Create your first note!</div>
-                            </div>
-                        </div>
+                <div class="notes-view-mode">
+                    <button class="view-mode-btn active" id="edit-mode-btn">
+                        <i class="fas fa-edit"></i> Edit Mode
+                    </button>
+                    <button class="view-mode-btn" id="view-mode-btn">
+                        <i class="fas fa-eye"></i> View Mode
+                    </button>
+                    <button class="view-mode-btn" id="mind-map-mode-btn">
+                        <i class="fas fa-project-diagram"></i> Mind Map
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" class="form-control" id="note-title" placeholder="Note Title">
+                </div>
+                
+                <div id="editor"></div>
+                <div id="notes-readonly" class="notes-readonly" style="display: none;"></div>
+                <div id="mind-map-container" class="mind-map-container" style="display: none;"></div>
+                
+                <!-- Enhanced PDF Export Container -->
+                <div class="pdf-export-container">
+                    <button class="pdf-export-btn" id="export-pdf-btn">
+                        <i class="fas fa-file-pdf"></i> Export to PDF
+                    </button>
+                    <button class="pdf-export-btn" id="show-pdf-options-btn">
+                        <i class="fas fa-cog"></i> PDF Options
+                    </button>
+                </div>
+                
+                <!-- PDF Export Options -->
+                <div class="pdf-export-options" id="pdf-export-options" style="display: none;">
+                    <div class="pdf-option">
+                        <input type="checkbox" id="include-header" checked>
+                        <label for="include-header">Include Header</label>
                     </div>
-                    
-                    <div class="widget">
-                        <div class="widget-header">
-                            <h2 class="widget-title">
-                                <i class="fas fa-edit"></i>
-                                Note Editor
-                            </h2>
-                        </div>
-                        <div class="widget-content">
-                            <!-- Quick Note Templates -->
-                            <div class="quick-templates">
-                                <button class="template-btn" data-template="lecture">Lecture Notes</button>
-                                <button class="template-btn" data-template="book">Book Summary</button>
-                                <button class="template-btn" data-template="meeting">Meeting Notes</button>
-                                <button class="template-btn" data-template="code">Code Snippet</button>
-                            </div>
-                            
-                            <!-- Session Quick Resume -->
-                            <div class="session-resume" id="session-resume" style="display: none;">
-                                <h3><i class="fas fa-history"></i> Continue Previous Session</h3>
-                                <p id="resume-session-info">You have an unfinished session from earlier.</p>
-                                <button class="btn btn-primary" id="resume-session-btn">
-                                    <i class="fas fa-play"></i> Resume Session
-                                </button>
-                            </div>
-                            
-                            <div class="notes-view-mode">
-                                <button class="view-mode-btn active" id="edit-mode-btn">
-                                    <i class="fas fa-edit"></i> Edit Mode
-                                </button>
-                                <button class="view-mode-btn" id="view-mode-btn">
-                                    <i class="fas fa-eye"></i> View Mode
-                                </button>
-                                <button class="view-mode-btn" id="mind-map-mode-btn">
-                                    <i class="fas fa-project-diagram"></i> Mind Map
-                                </button>
-                            </div>
-                            <div class="form-group">
-                                <input type="text" class="form-control" id="note-title" placeholder="Note Title">
-                            </div>
-                            <div id="editor"></div>
-                            <div id="notes-readonly" class="notes-readonly" style="display: none;"></div>
-                            <div id="mind-map-container" class="mind-map-container" style="display: none;"></div>
-                            <div class="note-sharing-options">
-                                <button class="btn btn-secondary" id="copy-note-btn">
-                                    <i class="fas fa-copy"></i> Copy Note
-                                </button>
-                                <button class="btn btn-secondary" id="summarize-note-btn">
-                                    <i class="fas fa-file-alt"></i> Summarize
-                                </button>
-                            </div>
-                            <div class="form-group" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                <button class="btn btn-primary" id="save-note-btn">
-                                    <i class="fas fa-save"></i> Save Note
-                                </button>
-                                <button class="btn btn-secondary" id="new-note-btn">
-                                    <i class="fas fa-file"></i> New Note
-                                </button>
-                                <button class="btn btn-secondary" id="export-note-btn">
-                                    <i class="fas fa-file-pdf"></i> Export as PDF
-                                </button>
-                                <button class="btn btn-secondary" id="delete-note-btn">
-                                    <i class="fas fa-trash"></i> Delete Note
-                                </button>
-                            </div>
-                        </div>
+                    <div class="pdf-option">
+                        <input type="checkbox" id="include-footer" checked>
+                        <label for="include-footer">Include Footer</label>
+                    </div>
+                    <div class="pdf-option">
+                        <input type="checkbox" id="page-numbers" checked>
+                        <label for="page-numbers">Page Numbers</label>
                     </div>
                 </div>
-            </section>
+                
+                <!-- PDF Loading Indicator -->
+                <div class="pdf-loading" id="pdf-loading">
+                    <div class="spinner"></div>
+                    <span>Generating PDF...</span>
+                </div>
+                
+                <div class="note-sharing-options">
+                    <button class="btn btn-secondary" id="copy-note-btn">
+                        <i class="fas fa-copy"></i> Copy Note
+                    </button>
+                    <button class="btn btn-secondary" id="summarize-note-btn">
+                        <i class="fas fa-file-alt"></i> Summarize
+                    </button>
+                </div>
+                
+                <div class="form-group" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" id="save-note-btn">
+                        <i class="fas fa-save"></i> Save Note
+                    </button>
+                    <button class="btn btn-secondary" id="new-note-btn">
+                        <i class="fas fa-file"></i> New Note
+                    </button>
+                    <button class="btn btn-secondary" id="delete-note-btn">
+                        <i class="fas fa-trash"></i> Delete Note
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
             
             <!-- Calendar Section -->
             <section id="calendar" class="section">
@@ -3121,7 +3274,6 @@
         const notesList = document.getElementById('notes-list');
         const saveNoteBtn = document.getElementById('save-note-btn');
         const newNoteBtn = document.getElementById('new-note-btn');
-        const exportNoteBtn = document.getElementById('export-note-btn');
         const deleteNoteBtn = document.getElementById('delete-note-btn');
         const noteTitle = document.getElementById('note-title');
         const startTimerBtn = document.getElementById('start-timer');
@@ -3173,7 +3325,6 @@
         const copyDataBtn = document.getElementById('copy-data-btn');
         const autoDeleteCompletedBtn = document.getElementById('auto-delete-completed-btn');
         
-        
         const focusEmoji = document.getElementById('focus-emoji');
         const emojiMessage = document.getElementById('emoji-message');
         const emojiPowerUpIndicator = document.getElementById('emoji-power-up-indicator');
@@ -3186,7 +3337,6 @@
         const copyNoteBtn = document.getElementById('copy-note-btn');
         const summarizeNoteBtn = document.getElementById('summarize-note-btn');
         
-       
         const templateButtons = document.querySelectorAll('.template-btn');
         const sessionResume = document.getElementById('session-resume');
         const resumeSessionBtn = document.getElementById('resume-session-btn');
@@ -3197,6 +3347,12 @@
         const generateSessionNameBtn = document.getElementById('generate-session-name');
         const questCards = document.querySelectorAll('.quest-card');
         const selectQuestBtn = document.getElementById('select-quest-btn');
+
+        // PDF Export Elements
+        const exportPDFBtn = document.getElementById('export-pdf-btn');
+        const showPDFOptionsBtn = document.getElementById('show-pdf-options-btn');
+        const pdfExportOptions = document.getElementById('pdf-export-options');
+        const pdfLoading = document.getElementById('pdf-loading');
 
         // Quill Editor
         const quill = new Quill('#editor', {
@@ -3236,11 +3392,9 @@
             updateSmartReminders();
             updateStudyPredictions();
             
-            
             setupFocusEmoji();
             setupEnvironment();
             setupMindMap();
-            
             
             setupQuickTemplates();
             setupSessionResume();
@@ -3249,6 +3403,9 @@
             setupSessionTemplates();
             setupSessionNaming();
             setupStudyQuests();
+            
+            // Initialize PDF Export
+            initPDFExport();
             
             // Check if user studied today for streak
             checkStreak();
@@ -3477,7 +3634,6 @@
             // Note controls
             saveNoteBtn.addEventListener('click', saveNote);
             newNoteBtn.addEventListener('click', newNote);
-            exportNoteBtn.addEventListener('click', exportNoteAsPDF);
             deleteNoteBtn.addEventListener('click', deleteNote);
 
             // Notes view mode buttons
@@ -3565,6 +3721,9 @@
             
             // New feature event listeners
             setupNewFeatureListeners();
+            
+            // PDF Export event listeners
+            setupPDFExportListeners();
         }
 
         // Setup enhanced feature event listeners
@@ -3634,17 +3793,486 @@
             selectQuestBtn.addEventListener('click', selectQuest);
         }
 
-        
+        // Setup PDF Export event listeners
+        function setupPDFExportListeners() {
+            exportPDFBtn.addEventListener('click', exportNoteToPDF);
+            showPDFOptionsBtn.addEventListener('click', () => {
+                pdfExportOptions.style.display = pdfExportOptions.style.display === 'none' ? 'flex' : 'none';
+            });
+        }
+
+        // Initialize PDF Export functionality
+        function initPDFExport() {
+            // Initialize PDF export options visibility
+            pdfExportOptions.style.display = 'none';
+        }
+
+        // Enhanced PDF Export Function
+        async function exportNoteToPDF() {
+            if (!state.currentNoteId) {
+                showToast('Please select or create a note first', 'error');
+                return;
+            }
+            
+            const note = state.notes.find(n => n.id === state.currentNoteId);
+            if (!note) {
+                showToast('Note not found', 'error');
+                return;
+            }
+            
+            // Show loading state
+            exportPDFBtn.disabled = true;
+            exportPDFBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            pdfLoading.classList.add('active');
+            
+            try {
+                // Get export options
+                const includeHeader = document.getElementById('include-header').checked;
+                const includeFooter = document.getElementById('include-footer').checked;
+                const includePageNumbers = document.getElementById('page-numbers').checked;
+                
+                // Generate PDF using enhanced method
+                await generateEnhancedPDF(note, {
+                    includeHeader,
+                    includeFooter,
+                    includePageNumbers
+                });
+                
+                showToast('PDF generated successfully!', 'success');
+                
+            } catch (error) {
+                console.error('PDF Generation Error:', error);
+                showToast('Failed to generate PDF: ' + error.message, 'error');
+            } finally {
+                // Reset loading state
+                exportPDFBtn.disabled = false;
+                exportPDFBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Export to PDF';
+                pdfLoading.classList.remove('active');
+            }
+        }
+
+        // Enhanced PDF Generation with proper pagination and formatting
+        async function generateEnhancedPDF(note, options) {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            
+            // PDF Configuration
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const margin = 20;
+            const contentWidth = pageWidth - (margin * 2);
+            let yPosition = margin;
+            
+            // Add header if enabled
+            if (options.includeHeader) {
+                // Title
+                pdf.setFontSize(20);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(26, 26, 46);
+                
+                // Split title into multiple lines if needed
+                const titleLines = pdf.splitTextToSize(note.title, contentWidth);
+                for (let line of titleLines) {
+                    if (yPosition > pageHeight - margin - 20) {
+                        pdf.addPage();
+                        yPosition = margin;
+                    }
+                    pdf.text(line, margin, yPosition);
+                    yPosition += 10;
+                }
+                
+                // Divider line
+                yPosition += 5;
+                pdf.setDrawColor(233, 69, 96);
+                pdf.setLineWidth(0.5);
+                pdf.line(margin, yPosition, pageWidth - margin, yPosition);
+                yPosition += 15;
+                
+                // Metadata
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(102, 102, 102);
+                const date = new Date(note.updatedAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                if (yPosition > pageHeight - margin - 10) {
+                    pdf.addPage();
+                    yPosition = margin;
+                }
+                
+                pdf.text(`Created: ${date}`, margin, yPosition);
+                pdf.text('StudyQuest', pageWidth - margin, yPosition, { align: 'right' });
+                yPosition += 15;
+            }
+            
+            // Create a temporary container to capture the note content
+            const tempContainer = document.createElement('div');
+            tempContainer.style.width = '800px';
+            tempContainer.style.padding = '20px';
+            tempContainer.style.fontFamily = "'Poppins', sans-serif";
+            tempContainer.style.color = '#212529';
+            tempContainer.style.backgroundColor = '#ffffff';
+            
+            // Add note content to temp container
+            tempContainer.innerHTML = `
+                <div style="font-size: 16px; line-height: 1.6;">
+                    ${note.content}
+                </div>
+            `;
+            
+            document.body.appendChild(tempContainer);
+            
+            try {
+                // Use html2canvas to capture the content
+                const canvas = await html2canvas(tempContainer, {
+                    scale: 2, // Higher resolution for better quality
+                    useCORS: true,
+                    backgroundColor: '#ffffff'
+                });
+                
+                document.body.removeChild(tempContainer);
+                
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = contentWidth;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                // Add image to PDF with pagination
+                let currentPage = 1;
+                let totalHeight = imgHeight;
+                let position = 0;
+                
+                while (position < totalHeight) {
+                    if (position > 0) {
+                        pdf.addPage();
+                    }
+                    
+                    const remainingPageHeight = pageHeight - yPosition - margin;
+                    const sliceHeight = Math.min(remainingPageHeight, totalHeight - position);
+                    
+                    // Calculate the slice of the image to show
+                    const sourceY = (position / totalHeight) * canvas.height;
+                    const sourceHeight = (sliceHeight / totalHeight) * canvas.height;
+                    
+                    // Create a temporary canvas for the slice
+                    const sliceCanvas = document.createElement('canvas');
+                    sliceCanvas.width = canvas.width;
+                    sliceCanvas.height = sourceHeight;
+                    const sliceCtx = sliceCanvas.getContext('2d');
+                    
+                    // Draw the slice
+                    sliceCtx.drawImage(
+                        canvas,
+                        0, sourceY, canvas.width, sourceHeight,
+                        0, 0, sliceCanvas.width, sliceCanvas.height
+                    );
+                    
+                    const sliceData = sliceCanvas.toDataURL('image/png');
+                    
+                    // Add the slice to PDF
+                    pdf.addImage(
+                        sliceData,
+                        'PNG',
+                        margin,
+                        yPosition,
+                        imgWidth,
+                        sliceHeight
+                    );
+                    
+                    position += sliceHeight;
+                    yPosition = margin; // Reset for next page
+                }
+                
+            } catch (error) {
+                console.error('Error generating PDF from HTML:', error);
+                document.body.removeChild(tempContainer);
+                
+                // Fallback to text-based PDF
+                const processedContent = processHTMLForPDF(note.content);
+                yPosition = addProcessedContentToPDF(pdf, processedContent, margin, contentWidth, pageHeight, yPosition, options);
+            }
+            
+            // Add footer if enabled
+            if (options.includeFooter) {
+                const footerY = pageHeight - margin;
+                
+                // Add separator line
+                pdf.setDrawColor(233, 69, 96);
+                pdf.setLineWidth(0.5);
+                pdf.line(margin, footerY - 10, pageWidth - margin, footerY - 10);
+                
+                // Add footer text
+                pdf.setFontSize(9);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(102, 102, 102);
+                pdf.text('StudyQuest - All-in-One Study Platform', margin, footerY - 5);
+            }
+            
+            // Add page numbers if enabled
+            if (options.includePageNumbers) {
+                const totalPages = pdf.internal.getNumberOfPages();
+                for (let i = 1; i <= totalPages; i++) {
+                    pdf.setPage(i);
+                    pdf.setFontSize(9);
+                    pdf.setTextColor(102, 102, 102);
+                    pdf.text(`Page ${i} of ${totalPages}`, pageWidth - margin, pageHeight - 10, { align: 'right' });
+                }
+            }
+            
+            // Save the PDF
+            const fileName = `${note.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${new Date().toISOString().split('T')[0]}.pdf`;
+            pdf.save(fileName);
+        }
+
+        // Process HTML content for PDF (fallback method)
+        function processHTMLForPDF(html) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Remove scripts and unwanted elements
+            const scripts = doc.querySelectorAll('script');
+            scripts.forEach(script => script.remove());
+            
+            // Process elements to maintain formatting
+            const processElement = (element) => {
+                const processed = [];
+                
+                // Handle text nodes
+                if (element.nodeType === Node.TEXT_NODE) {
+                    const text = element.textContent.trim();
+                    if (text) {
+                        processed.push({
+                            type: 'text',
+                            content: text,
+                            style: 'normal'
+                        });
+                    }
+                    return processed;
+                }
+                
+                // Handle element nodes
+                if (element.nodeType === Node.ELEMENT_NODE) {
+                    const tagName = element.tagName.toLowerCase();
+                    const children = Array.from(element.childNodes);
+                    
+                    switch(tagName) {
+                        case 'h1':
+                        case 'h2':
+                        case 'h3':
+                            const level = parseInt(tagName.charAt(1));
+                            const headingText = element.textContent.trim();
+                            if (headingText) {
+                                processed.push({
+                                    type: 'heading',
+                                    level: level,
+                                    content: headingText,
+                                    style: 'bold'
+                                });
+                            }
+                            break;
+                            
+                        case 'p':
+                            children.forEach(child => {
+                                processed.push(...processElement(child));
+                            });
+                            if (processed.length > 0) {
+                                processed[processed.length - 1].newParagraph = true;
+                            }
+                            break;
+                            
+                        case 'ul':
+                        case 'ol':
+                            const items = element.querySelectorAll('li');
+                            items.forEach((item, index) => {
+                                const itemText = item.textContent.trim();
+                                if (itemText) {
+                                    processed.push({
+                                        type: 'list',
+                                        content: itemText,
+                                        listType: tagName === 'ul' ? 'bullet' : 'numbered',
+                                        number: tagName === 'ol' ? index + 1 : null
+                                    });
+                                }
+                            });
+                            break;
+                            
+                        case 'strong':
+                        case 'b':
+                            children.forEach(child => {
+                                const childProcessed = processElement(child);
+                                childProcessed.forEach(item => {
+                                    item.style = 'bold';
+                                });
+                                processed.push(...childProcessed);
+                            });
+                            break;
+                            
+                        case 'em':
+                        case 'i':
+                            children.forEach(child => {
+                                const childProcessed = processElement(child);
+                                childProcessed.forEach(item => {
+                                    item.style = 'italic';
+                                });
+                                processed.push(...childProcessed);
+                            });
+                            break;
+                            
+                        case 'br':
+                            processed.push({
+                                type: 'linebreak'
+                            });
+                            break;
+                            
+                        case 'img':
+                            const alt = element.getAttribute('alt') || 'Image';
+                            const src = element.getAttribute('src');
+                            processed.push({
+                                type: 'image',
+                                content: alt,
+                                src: src
+                            });
+                            break;
+                            
+                        default:
+                            children.forEach(child => {
+                                processed.push(...processElement(child));
+                            });
+                    }
+                }
+                
+                return processed;
+            };
+            
+            return processElement(doc.body);
+        }
+
+        // Add processed content to PDF with proper pagination (fallback method)
+        function addProcessedContentToPDF(pdf, content, margin, contentWidth, pageHeight, startY, options) {
+            let yPosition = startY;
+            const fontSize = 11;
+            const lineHeight = 6;
+            const headingSizes = [20, 18, 16];
+            
+            for (let item of content) {
+                // Check for page break
+                if (yPosition > pageHeight - margin - 20) {
+                    pdf.addPage();
+                    yPosition = margin;
+                    
+                    // Add continuation message
+                    pdf.setFontSize(10);
+                    pdf.setFont('helvetica', 'italic');
+                    pdf.setTextColor(150, 150, 150);
+                    pdf.text('(continued...)', margin, yPosition);
+                    yPosition += 10;
+                }
+                
+                switch(item.type) {
+                    case 'heading':
+                        const headingSize = headingSizes[item.level - 1] || 16;
+                        pdf.setFontSize(headingSize);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setTextColor(26, 26, 46);
+                        
+                        // Split heading text
+                        const headingLines = pdf.splitTextToSize(item.content, contentWidth);
+                        for (let line of headingLines) {
+                            if (yPosition > pageHeight - margin - 20) {
+                                pdf.addPage();
+                                yPosition = margin;
+                            }
+                            pdf.text(line, margin, yPosition);
+                            yPosition += lineHeight + 4;
+                        }
+                        yPosition += 5; // Extra space after heading
+                        break;
+                        
+                    case 'text':
+                        pdf.setFontSize(fontSize);
+                        pdf.setFont('helvetica', item.style === 'bold' ? 'bold' : 
+                                    item.style === 'italic' ? 'italic' : 'normal');
+                        pdf.setTextColor(51, 51, 51);
+                        
+                        // Split text with proper word wrapping
+                        const textLines = pdf.splitTextToSize(item.content, contentWidth);
+                        for (let line of textLines) {
+                            if (yPosition > pageHeight - margin - 10) {
+                                pdf.addPage();
+                                yPosition = margin;
+                            }
+                            pdf.text(line, margin, yPosition);
+                            yPosition += lineHeight;
+                        }
+                        
+                        if (item.newParagraph) {
+                            yPosition += lineHeight / 2; // Paragraph spacing
+                        }
+                        break;
+                        
+                    case 'list':
+                        pdf.setFontSize(fontSize);
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.setTextColor(51, 51, 51);
+                        
+                        const prefix = item.listType === 'bullet' ? '• ' : `${item.number}. `;
+                        const listText = prefix + item.content;
+                        const listLines = pdf.splitTextToSize(listText, contentWidth - 5);
+                        
+                        for (let i = 0; i < listLines.length; i++) {
+                            if (yPosition > pageHeight - margin - 10) {
+                                pdf.addPage();
+                                yPosition = margin;
+                            }
+                            
+                            if (i === 0) {
+                                pdf.text(listLines[i], margin, yPosition);
+                            } else {
+                                pdf.text(listLines[i], margin + 8, yPosition);
+                            }
+                            
+                            yPosition += lineHeight;
+                        }
+                        yPosition += 2; // Space between list items
+                        break;
+                        
+                    case 'linebreak':
+                        yPosition += lineHeight;
+                        break;
+                        
+                    case 'image':
+                        pdf.setFontSize(10);
+                        pdf.setFont('helvetica', 'italic');
+                        pdf.setTextColor(150, 150, 150);
+                        
+                        if (yPosition > pageHeight - margin - 20) {
+                            pdf.addPage();
+                            yPosition = margin;
+                        }
+                        
+                        pdf.text(`[Image: ${item.content}]`, margin, yPosition);
+                        yPosition += 15; // Space for image placeholder
+                        break;
+                }
+                
+                // Reset to default font after each item
+                pdf.setFont('helvetica', 'normal');
+                pdf.setFontSize(fontSize);
+            }
+            
+            return yPosition;
+        }
 
         // Quick Note Templates
         function setupQuickTemplates() {
-           
+            // Already initialized in setupNewFeatureListeners
         }
 
         function applyQuickTemplate(template) {
             if (state.quickTemplates[template]) {
                 quill.root.innerHTML = state.quickTemplates[template];
-                
                 
                 if (template === 'code') {
                     setTimeout(() => {
@@ -3670,8 +4298,7 @@
 
         // Session Quick Resume
         function setupSessionResume() {
-           
-            if (state.lastTimerState) {
+            if (state.lastTimerState && state.lastTimerState.running === false) {
                 const sessionTime = new Date();
                 const now = new Date();
                 const hoursSinceSession = (now - sessionTime) / (1000 * 60 * 60);
@@ -3712,7 +4339,7 @@
 
         // Quick Mood Check-in
         function setupMoodCheckin() {
-            
+            // Already initialized in setupNewFeatureListeners
         }
 
         function setMood(mood) {
@@ -3817,7 +4444,6 @@
             
             // Award seasonal achievement if not already unlocked
             if (achievementId && !state.achievements.find(a => a.id === achievementId && a.unlocked)) {
-                
                 showToast(`Seasonal theme activated! ${message}`);
             }
             
@@ -3826,7 +4452,7 @@
 
         // Quick Session Templates
         function setupSessionTemplates() {
-            
+            // Already initialized in setupNewFeatureListeners
         }
 
         function applySessionTemplate(templateType) {
@@ -3853,7 +4479,7 @@
 
         // Study Session Naming
         function setupSessionNaming() {
-            
+            // Already initialized in setupNewFeatureListeners
         }
 
         function generateSessionName() {
@@ -3880,7 +4506,7 @@
 
         // Study Quests
         function setupStudyQuests() {
-            
+            // Already initialized in setupNewFeatureListeners
         }
 
         function selectQuest() {
@@ -4186,225 +4812,6 @@
             document.querySelectorAll('.note-item').forEach(item => {
                 item.classList.remove('active');
             });
-        }
-
-        // Fixed PDF Export Function
-        function exportNoteAsPDF() {
-            if (!state.currentNoteId) {
-                showToast('Please select or create a note first', 'error');
-                return;
-            }
-            
-            const note = state.notes.find(n => n.id === state.currentNoteId);
-            if (!note) {
-                showToast('Note not found', 'error');
-                return;
-            }
-            
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            
-            // Set up PDF styling
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            const pageHeight = pdf.internal.pageSize.getHeight();
-            const margin = 20;
-            const contentWidth = pageWidth - (margin * 2);
-            
-            // Add header
-            pdf.setFontSize(20);
-            pdf.setFont('helvetica', 'bold');
-            pdf.text(note.title, margin, margin + 10);
-            
-            // Add date
-            pdf.setFontSize(10);
-            pdf.setFont('helvetica', 'normal');
-            const date = new Date(note.updatedAt).toLocaleDateString();
-            pdf.text(`Last updated: ${date}`, margin, margin + 18);
-            
-            // Add content
-            let yPosition = margin + 30;
-            
-            // Create a temporary div to parse the HTML content
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = note.content;
-            
-            // Process each element in the content
-            const elements = tempDiv.children;
-            
-            for (let i = 0; i < elements.length; i++) {
-                const element = elements[i];
-                const tagName = element.tagName.toLowerCase();
-                
-                // Check if we need a new page
-                if (yPosition > pageHeight - margin) {
-                    pdf.addPage();
-                    yPosition = margin;
-                }
-                
-                // Handle different element types
-                if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3') {
-                    // Handle headers
-                    const fontSize = tagName === 'h1' ? 16 : tagName === 'h2' ? 14 : 12;
-                    pdf.setFontSize(fontSize);
-                    pdf.setFont('helvetica', 'bold');
-                    
-                    const text = element.textContent;
-                    const lines = pdf.splitTextToSize(text, contentWidth);
-                    
-                    lines.forEach(line => {
-                        if (yPosition > pageHeight - margin) {
-                            pdf.addPage();
-                            yPosition = margin;
-                        }
-                        pdf.text(line, margin, yPosition);
-                        yPosition += 8;
-                    });
-                    
-                    yPosition += 5; // Extra space after header
-                } 
-                else if (tagName === 'p') {
-                    // Handle paragraphs
-                    pdf.setFontSize(11);
-                    pdf.setFont('helvetica', 'normal');
-                    
-                    const text = element.textContent;
-                    const lines = pdf.splitTextToSize(text, contentWidth);
-                    
-                    lines.forEach(line => {
-                        if (yPosition > pageHeight - margin) {
-                            pdf.addPage();
-                            yPosition = margin;
-                        }
-                        pdf.text(line, margin, yPosition);
-                        yPosition += 6;
-                    });
-                    
-                    yPosition += 3; // Extra space after paragraph
-                }
-                else if (tagName === 'ul' || tagName === 'ol') {
-                    // Handle lists
-                    const listItems = element.querySelectorAll('li');
-                    
-                    listItems.forEach(item => {
-                        if (yPosition > pageHeight - margin) {
-                            pdf.addPage();
-                            yPosition = margin;
-                        }
-                        
-                        pdf.setFontSize(11);
-                        pdf.setFont('helvetica', 'normal');
-                        
-                        const bullet = tagName === 'ul' ? '• ' : (Array.from(listItems).indexOf(item) + 1) + '. ';
-                        const text = bullet + item.textContent;
-                        const lines = pdf.splitTextToSize(text, contentWidth - 5);
-                        
-                        lines.forEach((line, index) => {
-                            if (yPosition > pageHeight - margin) {
-                                pdf.addPage();
-                                yPosition = margin;
-                            }
-                            
-                            if (index === 0) {
-                                pdf.text(line, margin, yPosition);
-                            } else {
-                                pdf.text(line, margin + 8, yPosition);
-                            }
-                            
-                            yPosition += 6;
-                        });
-                    });
-                    
-                    yPosition += 3; // Extra space after list
-                }
-                else if (tagName === 'blockquote') {
-                    // Handle blockquotes
-                    pdf.setFontSize(11);
-                    pdf.setFont('helvetica', 'italic');
-                    
-                    const text = element.textContent;
-                    const lines = pdf.splitTextToSize(text, contentWidth - 10);
-                    
-                    // Draw a border for the blockquote
-                    pdf.setDrawColor(200, 200, 200);
-                    pdf.rect(margin, yPosition - 2, 3, lines.length * 6 + 4);
-                    
-                    lines.forEach(line => {
-                        if (yPosition > pageHeight - margin) {
-                            pdf.addPage();
-                            yPosition = margin;
-                        }
-                        pdf.text(line, margin + 8, yPosition);
-                        yPosition += 6;
-                    });
-                    
-                    yPosition += 5; // Extra space after blockquote
-                }
-                else if (tagName === 'div' && element.classList.contains('code-block')) {
-                    // Handle code blocks
-                    const codeContent = element.querySelector('.code-content');
-                    if (codeContent) {
-                        const code = codeContent.textContent || codeContent.innerText;
-                        
-                        if (yPosition > pageHeight - margin - 20) {
-                            pdf.addPage();
-                            yPosition = margin;
-                        }
-                        
-                        // Draw code block background
-                        pdf.setFillColor(240, 240, 240);
-                        pdf.rect(margin, yPosition - 3, contentWidth, 20, 'F');
-                        
-                        // Add code text
-                        pdf.setFontSize(9);
-                        pdf.setFont('courier', 'normal');
-                        pdf.setTextColor(0, 0, 0);
-                        
-                        const codeLines = pdf.splitTextToSize(code, contentWidth - 10);
-                        codeLines.forEach(line => {
-                            if (yPosition > pageHeight - margin) {
-                                pdf.addPage();
-                                yPosition = margin;
-                            }
-                            pdf.text(line, margin + 5, yPosition);
-                            yPosition += 4;
-                        });
-                        
-                        yPosition += 5; // Extra space after code block
-                    }
-                }
-                else {
-                    // Handle any other elements as plain text
-                    pdf.setFontSize(11);
-                    pdf.setFont('helvetica', 'normal');
-                    
-                    const text = element.textContent;
-                    const lines = pdf.splitTextToSize(text, contentWidth);
-                    
-                    lines.forEach(line => {
-                        if (yPosition > pageHeight - margin) {
-                            pdf.addPage();
-                            yPosition = margin;
-                        }
-                        pdf.text(line, margin, yPosition);
-                        yPosition += 6;
-                    });
-                    
-                    yPosition += 3; // Extra space after element
-                }
-            }
-            
-            // Add page numbers
-            const pageCount = pdf.internal.getNumberOfPages();
-            for (let i = 1; i <= pageCount; i++) {
-                pdf.setPage(i);
-                pdf.setFontSize(8);
-                pdf.setTextColor(128, 128, 128);
-                pdf.text(`Page ${i} of ${pageCount}`, pageWidth - margin, pageHeight - 10);
-            }
-            
-            // Save the PDF
-            pdf.save(`${note.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`);
-            showToast('PDF exported successfully!');
         }
 
         function deleteNote() {
@@ -4776,8 +5183,6 @@
             }
         }
 
-      
-
         // Focus Emoji Functions
         function setupFocusEmoji() {
             focusEmoji.textContent = state.focusEmoji;
@@ -4970,7 +5375,7 @@
             saveState();
         }
 
-        // Mind Map Functions - Fixed
+        // Mind Map Functions
         function setupMindMap() {
             // Initialize mind map functionality
         }
@@ -5417,42 +5822,34 @@
                             state.resources.push({
                                 id: generateId(),
                                 ...newResource,
-                                description: "Discovered while studying!"
+                                description: "Automatically added as a surprise reward!"
                             });
                             saveState();
                             renderResources();
                         }
                     }
                     
-                    showToast(`🎉 ${reward.message}`, 'success');
-                    addNotification(`Surprise Reward: ${reward.message}`);
-                    
-                    // Add to surprise rewards history
-                    state.surpriseRewards.push({
-                        type: reward.type,
-                        message: reward.message,
-                        timestamp: new Date().toISOString()
-                    });
-                    saveState();
+                    showToast(`🎉 Surprise! ${reward.message}`, 'success');
                 }
             }
         }
 
-        // Rendering functions
+        // Helper functions for rendering and updating
         function renderAll() {
             renderTasks();
-            renderNotes();
             renderTimetable();
             renderTodaySchedule();
+            renderNotes();
             renderCalendar();
             renderSubjects();
             renderResources();
             renderAchievements();
             updateTaskSubjectSelect();
+            updateNotifications();
+            updateSessionsProgress();
         }
 
         function renderTasks() {
-            // Clear task lists
             taskList.innerHTML = '';
             dashboardTasks.innerHTML = '';
             
@@ -5462,664 +5859,98 @@
                 return;
             }
             
-            // Sort tasks: incomplete first, then by due date
-            const sortedTasks = [...state.tasks].sort((a, b) => {
-                if (a.completed !== b.completed) {
-                    return a.completed ? 1 : -1;
-                }
-                return new Date(a.due) - new Date(b.due);
-            });
+            // Sort tasks by due date
+            const sortedTasks = [...state.tasks].sort((a, b) => new Date(a.due) - new Date(b.due));
             
-            // Render tasks in task manager
+            // Render for main task list
             sortedTasks.forEach(task => {
-                const taskItem = document.createElement('li');
-                taskItem.className = 'task-item';
-                if (task.completed) taskItem.style.opacity = '0.7';
-                
-                const dueDate = new Date(task.due);
-                const formattedDate = dueDate.toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    day: 'numeric' 
-                });
-                
-                taskItem.innerHTML = `
-                    <div class="task-checkbox ${task.completed ? 'checked' : ''}" data-task-id="${task.id}">
-                        ${task.completed ? '<i class="fas fa-check"></i>' : ''}
-                    </div>
-                    <div class="task-info">
-                        <div class="task-title">${task.title}</div>
-                        <div class="task-due">Due: ${formattedDate}</div>
-                        ${task.description ? `<div class="task-desc">${task.description}</div>` : ''}
-                    </div>
-                    <div class="task-actions">
-                        <button class="task-btn edit-task" data-task-id="${task.id}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="task-btn delete-task" data-task-id="${task.id}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `;
-                
+                const taskItem = createTaskElement(task);
                 taskList.appendChild(taskItem);
             });
             
-            // Render upcoming tasks in dashboard (only incomplete, max 3)
-            const upcomingTasks = sortedTasks
-                .filter(task => !task.completed)
-                .slice(0, 3);
-                
-            if (upcomingTasks.length === 0) {
+            // Render for dashboard (only upcoming tasks, limit to 5)
+            const upcomingTasks = sortedTasks.filter(t => !t.completed).slice(0, 5);
+            if (upcomingTasks.length > 0) {
+                upcomingTasks.forEach(task => {
+                    const taskItem = createTaskElement(task, true);
+                    dashboardTasks.appendChild(taskItem);
+                });
+            } else {
                 dashboardTasks.innerHTML = '<li class="empty-state">No upcoming tasks. Add a task to get started!</li>';
-                return;
             }
-                
-            upcomingTasks.forEach(task => {
-                const taskItem = document.createElement('li');
-                taskItem.className = 'task-item';
-                
-                const dueDate = new Date(task.due);
-                const formattedDate = dueDate.toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    day: 'numeric' 
-                });
-                
-                taskItem.innerHTML = `
-                    <div class="task-checkbox" data-task-id="${task.id}">
-                    </div>
-                    <div class="task-info">
-                        <div class="task-title">${task.title}</div>
-                        <div class="task-due">Due: ${formattedDate}</div>
-                    </div>
-                `;
-                
-                dashboardTasks.appendChild(taskItem);
-            });
-            
-            // Add event listeners to task checkboxes
-            document.querySelectorAll('.task-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('click', (e) => {
-                    const taskId = checkbox.getAttribute('data-task-id');
-                    toggleTaskCompletion(taskId);
-                });
-            });
-            
-            // Add event listeners to edit and delete buttons
-            document.querySelectorAll('.edit-task').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const taskId = btn.getAttribute('data-task-id');
-                    editTask(taskId);
-                });
-            });
-            
-            document.querySelectorAll('.delete-task').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const taskId = btn.getAttribute('data-task-id');
-                    // Remove the task directly without checking completion status
-                    if (confirm('Are you sure you want to delete this task?')) {
-                        state.tasks = state.tasks.filter(t => t.id !== taskId);
-                        saveState();
-                        renderTasks();
-                        showToast('Task deleted successfully!');
-                    }
-                });
-            });
         }
 
-        function renderNotes() {
-            notesList.innerHTML = '';
+        function createTaskElement(task, isDashboard = false) {
+            const li = document.createElement('li');
+            li.className = 'task-item';
+            li.setAttribute('data-task-id', task.id);
             
-            if (state.notes.length === 0) {
-                notesList.innerHTML = '<div class="empty-state">No notes yet. Create your first note!</div>';
-                return;
-            }
-            
-            // Sort notes by updated date (newest first)
-            const sortedNotes = [...state.notes].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-            
-            sortedNotes.forEach(note => {
-                const noteItem = document.createElement('div');
-                noteItem.className = `note-item ${state.currentNoteId === note.id ? 'active' : ''}`;
-                noteItem.setAttribute('data-note-id', note.id);
-                
-                // Create a preview of the note content (text only, no HTML)
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = note.content;
-                const textContent = tempDiv.textContent || tempDiv.innerText || '';
-                const preview = textContent.length > 100 ? textContent.substring(0, 100) + '...' : textContent;
-                
-                const updatedDate = new Date(note.updatedAt);
-                const formattedDate = updatedDate.toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    day: 'numeric',
-                    year: 'numeric'
-                });
-                
-                noteItem.innerHTML = `
-                    <div class="note-title">${note.title}</div>
-                    <div class="note-preview">${preview}</div>
-                    <div class="note-date">Updated: ${formattedDate}</div>
-                `;
-                
-                noteItem.addEventListener('click', () => {
-                    loadNoteForEditing(note.id);
-                });
-                
-                notesList.appendChild(noteItem);
+            const dueDate = new Date(task.due);
+            const dueText = dueDate.toLocaleDateString('en-US', { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric' 
             });
-        }
-
-        function renderTimetable() {
-            timetableGrid.innerHTML = '';
             
-            // Create header row
-            timetableGrid.innerHTML = `
-                <div class="time-slot"></div>
-                <div class="day-header">Mon</div>
-                <div class="day-header">Tue</div>
-                <div class="day-header">Wed</div>
-                <div class="day-header">Thu</div>
-                <div class="day-header">Fri</div>
-                <div class="day-header">Sat</div>
-                <div class="day-header">Sun</div>
+            li.innerHTML = `
+                <div class="task-checkbox ${task.completed ? 'checked' : ''}" data-task-id="${task.id}">
+                    ${task.completed ? '<i class="fas fa-check"></i>' : ''}
+                </div>
+                <div class="task-info">
+                    <div class="task-title">${task.title}</div>
+                    <div class="task-due">Due: ${dueText}</div>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn edit-task" data-task-id="${task.id}">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="task-btn delete-task" data-task-id="${task.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             `;
-            
-            // Create time slots (8 AM to 5 PM)
-            for (let hour = 8; hour <= 17; hour++) {
-                const timeSlot = document.createElement('div');
-                timeSlot.className = 'time-slot';
-                timeSlot.textContent = `${hour}:00`;
-                timetableGrid.appendChild(timeSlot);
-                
-                // Create cells for each day
-                for (let day = 1; day <= 7; day++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'timetable-cell';
-                    cell.setAttribute('data-day', day);
-                    cell.setAttribute('data-time', hour);
-                    
-                    // Check if there's a class at this time
-                    const classAtThisTime = state.classes.find(c => c.day === day && c.time === hour);
-                    if (classAtThisTime) {
-                        cell.classList.add('has-class');
-                        cell.style.borderLeftColor = classAtThisTime.color;
-                        cell.innerHTML = `
-                            <div class="class-subject">${classAtThisTime.subject}</div>
-                            <div class="class-topic">${classAtThisTime.topic}</div>
-                        `;
-                    }
-                    
-                    cell.addEventListener('click', () => {
-                        editClassAtTime(day, hour);
-                    });
-                    
-                    timetableGrid.appendChild(cell);
-                }
-            }
-        }
-
-        function renderTodaySchedule() {
-            todaySchedule.innerHTML = '';
-            
-            const today = new Date().getDay();
-            // Convert Sunday (0) to 7 for our day system
-            const todayAdjusted = today === 0 ? 7 : today;
-            
-            const todayClasses = state.classes.filter(c => c.day === todayAdjusted)
-                                              .sort((a, b) => a.time - b.time);
-            
-            if (todayClasses.length === 0) {
-                todaySchedule.innerHTML = '<p class="empty-state">No classes scheduled for today. Add some in the Timetable!</p>';
-                return;
-            }
-            
-            todayClasses.forEach(classItem => {
-                const classElement = document.createElement('div');
-                classElement.className = 'class-item';
-                classElement.innerHTML = `
-                    <div class="class-time">${classItem.time}:00 - ${classItem.time + 1}:00</div>
-                    <div class="class-info">
-                        <div class="class-subject">${classItem.subject}</div>
-                        <div class="class-topic">${classItem.topic}</div>
-                    </div>
-                `;
-                classElement.style.borderLeft = `4px solid ${classItem.color}`;
-                todaySchedule.appendChild(classElement);
-            });
-        }
-
-        function renderCalendar() {
-            calendarGrid.innerHTML = '';
-            
-            // Create day headers
-            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            days.forEach(day => {
-                const dayHeader = document.createElement('div');
-                dayHeader.className = 'calendar-day-header';
-                dayHeader.textContent = day;
-                calendarGrid.appendChild(dayHeader);
-            });
-            
-            // Get first day of month and number of days
-            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            
-            // Add empty cells for days before the first day of the month
-            for (let i = 0; i < firstDay; i++) {
-                const emptyCell = document.createElement('div');
-                emptyCell.className = 'calendar-day empty';
-                calendarGrid.appendChild(emptyCell);
-            }
-            
-            // Add cells for each day of the month
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dayCell = document.createElement('div');
-                dayCell.className = 'calendar-day';
-                dayCell.innerHTML = `<div class="day-number">${day}</div>`;
-                
-                // Check if there are events on this day
-                const dateStr = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-                const dayEvents = state.events.filter(e => e.date === dateStr);
-                
-                dayEvents.forEach(event => {
-                    const eventElement = document.createElement('div');
-                    eventElement.className = 'calendar-event';
-                    eventElement.textContent = event.title;
-                    eventElement.title = event.description;
-                    eventElement.setAttribute('data-event-id', event.id);
-                    dayCell.appendChild(eventElement);
-                    
-                    // Add click event to delete events
-                    eventElement.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        if (confirm(`Delete event "${event.title}"?`)) {
-                            state.events = state.events.filter(ev => ev.id !== event.id);
-                            saveState();
-                            renderCalendar();
-                            showToast('Event deleted successfully!');
-                        }
-                    });
-                });
-                
-                // Add click event to add events
-                dayCell.addEventListener('click', () => {
-                    addEventOnDate(dateStr);
-                });
-                
-                calendarGrid.appendChild(dayCell);
-            }
-            
-            // Update calendar header
-            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December'];
-            document.querySelector('#calendar .widget-title').innerHTML = `
-                <i class="fas fa-calendar"></i>
-                ${monthNames[currentMonth]} ${currentYear}
-            `;
-        }
-
-        function renderSubjects() {
-            subjectsGrid.innerHTML = '';
-            
-            if (state.subjects.length === 0) {
-                subjectsGrid.innerHTML = '<div class="empty-state">No subjects added yet. Add your first subject!</div>';
-                return;
-            }
-            
-            state.subjects.forEach(subject => {
-                const subjectCard = document.createElement('div');
-                subjectCard.className = 'widget';
-                subjectCard.innerHTML = `
-                    <div class="widget-header">
-                        <h2 class="widget-title">
-                            <i class="fas fa-book" style="color: ${subject.color}"></i>
-                            ${subject.name}
-                        </h2>
-                        <button class="btn btn-secondary edit-subject" data-subject-id="${subject.id}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </div>
-                    <div class="widget-content">
-                        <h3 style="margin-bottom: 10px;">Resources</h3>
-                        ${subject.resources.length > 0 ? 
-                            `<ul class="resource-list">
-                                ${subject.resources.map(resource => 
-                                    `<li><a href="${resource}" target="_blank">${resource}</a></li>`
-                                ).join('')}
-                            </ul>` : 
-                            '<p class="empty-state">No resources added yet.</p>'
-                        }
-                    </div>
-                `;
-                
-                subjectsGrid.appendChild(subjectCard);
-            });
-            
-            // Add event listeners to edit buttons
-            document.querySelectorAll('.edit-subject').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const subjectId = btn.getAttribute('data-subject-id');
-                    editSubject(subjectId);
-                });
-            });
-        }
-
-        function renderResources() {
-            resourcesContainer.innerHTML = '';
-            
-            if (state.resources.length === 0) {
-                resourcesContainer.innerHTML = '<div class="empty-state">No resources added yet. Add your first resource!</div>';
-                return;
-            }
-            
-            // Group resources by category
-            const resourcesByCategory = {};
-            state.resources.forEach(resource => {
-                if (!resourcesByCategory[resource.category]) {
-                    resourcesByCategory[resource.category] = [];
-                }
-                resourcesByCategory[resource.category].push(resource);
-            });
-            
-            // Render resources by category
-            Object.keys(resourcesByCategory).forEach(category => {
-                const categoryDiv = document.createElement('div');
-                categoryDiv.className = 'resource-category';
-                
-                const categoryTitle = document.createElement('h3');
-                categoryTitle.textContent = category.charAt(0).toUpperCase() + category.slice(1) + ' Resources';
-                categoryDiv.appendChild(categoryTitle);
-                
-                resourcesByCategory[category].forEach(resource => {
-                    const resourceItem = document.createElement('div');
-                    resourceItem.className = 'resource-item';
-                    
-                    // Get appropriate icon for category
-                    let icon = 'fa-link';
-                    if (category === 'pdf') icon = 'fa-file-pdf';
-                    else if (category === 'video') icon = 'fa-video';
-                    else if (category === 'book') icon = 'fa-book';
-                    else if (category === 'article') icon = 'fa-newspaper';
-                    
-                    resourceItem.innerHTML = `
-                        <div class="resource-icon">
-                            <i class="fas ${icon}"></i>
-                        </div>
-                        <div class="resource-info">
-                            <div class="resource-name">${resource.name}</div>
-                            <div class="resource-desc">${resource.description || resource.url}</div>
-                        </div>
-                        <div class="resource-actions">
-                            <button class="btn btn-secondary open-resource" data-resource-url="${resource.url}">
-                                <i class="fas fa-external-link-alt"></i>
-                            </button>
-                            <button class="btn btn-secondary edit-resource" data-resource-id="${resource.id}">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-secondary delete-resource" data-resource-id="${resource.id}">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                    
-                    categoryDiv.appendChild(resourceItem);
-                });
-                
-                resourcesContainer.appendChild(categoryDiv);
-            });
             
             // Add event listeners
-            document.querySelectorAll('.open-resource').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const url = btn.getAttribute('data-resource-url');
-                    window.open(url, '_blank');
-                });
-            });
+            li.querySelector('.task-checkbox').addEventListener('click', () => toggleTaskCompletion(task.id));
+            li.querySelector('.edit-task').addEventListener('click', () => editTask(task.id));
+            li.querySelector('.delete-task').addEventListener('click', () => deleteTaskFromList(task.id));
             
-            document.querySelectorAll('.edit-resource').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const resourceId = btn.getAttribute('data-resource-id');
-                    editResource(resourceId);
-                });
-            });
-            
-            document.querySelectorAll('.delete-resource').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const resourceId = btn.getAttribute('data-resource-id');
-                    if (confirm('Are you sure you want to delete this resource?')) {
-                        state.resources = state.resources.filter(r => r.id !== resourceId);
-                        saveState();
-                        renderResources();
-                        showToast('Resource deleted successfully!');
-                    }
-                });
-            });
-        }
-
-        function renderAchievements() {
-            achievementsGrid.innerHTML = '';
-            
-            state.achievements.forEach(achievement => {
-                const achievementCard = document.createElement('div');
-                achievementCard.className = `achievement-card ${achievement.unlocked ? 'unlocked' : 'locked'}`;
-                
-                achievementCard.innerHTML = `
-                    <div class="achievement-icon">
-                        <i class="fas ${achievement.icon}"></i>
-                    </div>
-                    <div class="achievement-name">${achievement.name}</div>
-                    <div class="achievement-desc">${achievement.description}</div>
-                    ${!achievement.unlocked ? 
-                        `<div class="achievement-progress">${achievement.progress}/${achievement.target}</div>` : 
-                        ''
-                    }
-                `;
-                
-                achievementsGrid.appendChild(achievementCard);
-            });
-        }
-
-        // Helper functions
-        function generateId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2);
-        }
-
-        function updateStats() {
-            xpCount.textContent = state.xp.toLocaleString();
-            streakCount.textContent = state.streak;
-            levelCount.textContent = state.level;
-            userLevel.textContent = state.level;
-            
-            // Update XP progress
-            const xpForNextLevel = state.level * 500;
-            const xpInCurrentLevel = state.xp - ((state.level - 1) * 500);
-            const xpProgress = (xpInCurrentLevel / xpForNextLevel) * 100;
-            
-            xpProgressText.textContent = `${xpInCurrentLevel}/${xpForNextLevel}`;
-            xpProgressBar.style.width = `${xpProgress}%`;
-        }
-
-        function updateSessionsProgress() {
-            sessionsCount.textContent = state.timerSessions;
-            const sessionsProgressValue = (state.timerSessions / 5) * 100;
-            sessionsProgress.style.width = `${Math.min(sessionsProgressValue, 100)}%`;
-        }
-
-        function updateTaskSubjectSelect() {
-            taskSubjectSelect.innerHTML = '<option value="">No Subject</option>';
-            state.subjects.forEach(subject => {
-                const option = document.createElement('option');
-                option.value = subject.id;
-                option.textContent = subject.name;
-                taskSubjectSelect.appendChild(option);
-            });
-        }
-
-        function awardXP(amount) {
-            state.xp += amount;
-            
-            // Check for level up
-            const newLevel = Math.floor(state.xp / 500) + 1;
-            if (newLevel > state.level) {
-                state.level = newLevel;
-                showToast(`🎉 Level Up! You've reached Level ${state.level}!`, 'success');
+            // For dashboard, remove edit/delete buttons
+            if (isDashboard) {
+                li.querySelector('.task-actions').remove();
             }
             
-            updateStats();
-            saveState();
-        }
-
-        function updateStreak() {
-            const today = new Date().toDateString();
-            
-            if (state.lastStudyDate !== today) {
-                // Check if yesterday was studied (for streak continuation)
-                const yesterday = new Date();
-                yesterday.setDate(yesterday.getDate() - 1);
-                const yesterdayStr = yesterday.toDateString();
-                
-                if (state.lastStudyDate === yesterdayStr) {
-                    state.streak++;
-                } else {
-                    state.streak = 1;
-                }
-                
-                state.lastStudyDate = today;
-                updateStats();
-                saveState();
-                
-                // Check for streak achievement
-                checkAchievement(3); // Consistency is Key
-            }
-        }
-
-        function checkStreak() {
-            const today = new Date().toDateString();
-            
-            if (state.lastStudyDate === today) {
-                // Already studied today, streak continues
-                return;
-            }
-            
-            // Check if streak should be reset (missed a day)
-            if (state.lastStudyDate) {
-                const lastStudy = new Date(state.lastStudyDate);
-                const todayObj = new Date();
-                const diffTime = Math.abs(todayObj - lastStudy);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
-                if (diffDays > 1) {
-                    state.streak = 0;
-                    updateStats();
-                    saveState();
-                }
-            }
-        }
-
-        function checkAchievement(achievementId) {
-            const achievement = state.achievements.find(a => a.id === achievementId);
-            if (!achievement || achievement.unlocked) return;
-            
-            let shouldUnlock = false;
-            
-            switch (achievementId) {
-                case 1: // First Step
-                    achievement.progress = state.tasks.filter(t => t.completed).length;
-                    shouldUnlock = achievement.progress >= achievement.target;
-                    break;
-                case 2: // Marathon Runner
-                    achievement.progress = state.timerSessions;
-                    shouldUnlock = achievement.progress >= achievement.target;
-                    break;
-                case 3: // Consistency is Key
-                    achievement.progress = state.streak;
-                    shouldUnlock = achievement.progress >= achievement.target;
-                    break;
-                case 4: // Subject Master
-                    // This would require tracking study sessions per subject
-                    // For demo, we'll use a random progress
-                    achievement.progress = Math.min(achievement.progress + 1, achievement.target);
-                    shouldUnlock = achievement.progress >= achievement.target;
-                    break;
-                case 5: // Task Crusher
-                    achievement.progress = state.tasks.filter(t => t.completed).length;
-                    shouldUnlock = achievement.progress >= achievement.target;
-                    break;
-                case 6: // Early Bird
-                    const now = new Date();
-                    if (now.getHours() < 8) {
-                        achievement.progress = 1;
-                        shouldUnlock = true;
-                    }
-                    break;
-                case 7: // Weekend Warrior
-                    const today = new Date();
-                    if (today.getDay() === 0 || today.getDay() === 6) {
-                        achievement.progress = 1;
-                        shouldUnlock = true;
-                    }
-                    break;
-                case 8: // Perfect Week
-                    
-                    if (Math.random() > 0.7) {
-                        achievement.progress = 1;
-                        shouldUnlock = true;
-                    }
-                    break;
-            }
-            
-            if (shouldUnlock && !achievement.unlocked) {
-                achievement.unlocked = true;
-                awardXP(100); // Bonus XP for achievements
-                showToast(`🏆 Achievement Unlocked: ${achievement.name}!`, 'success');
-                renderAchievements();
-                addNotification(`Achievement Unlocked: ${achievement.name}`);
-                saveState();
-            }
-        }
-
-        function addNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification-item';
-            notification.innerHTML = `
-                <div class="notification-icon" style="color: var(--accent);">
-                    <i class="fas fa-trophy"></i>
-                </div>
-                <div class="notification-content">
-                    <div class="notification-title">Achievement Unlocked!</div>
-                    <div class="notification-desc">${message}</div>
-                </div>
-            `;
-            
-            notificationList.insertBefore(notification, notificationList.firstChild);
-            
-            // Limit to 5 notifications
-            if (notificationList.children.length > 5) {
-                notificationList.removeChild(notificationList.lastChild);
-            }
+            return li;
         }
 
         function toggleTaskCompletion(taskId) {
-            const task = state.tasks.find(t => t.id === taskId);
-            if (task) {
-                task.completed = !task.completed;
+            const taskIndex = state.tasks.findIndex(t => t.id === taskId);
+            if (taskIndex !== -1) {
+                state.tasks[taskIndex].completed = !state.tasks[taskIndex].completed;
                 
-                // Award XP for completing a task
-                if (task.completed) {
-                    awardXP(25);
+                // Award XP for completing task
+                if (state.tasks[taskIndex].completed) {
+                    let xpEarned = 25;
+                    
+                    // Apply power-up bonuses
+                    if (state.emojiPowerUps.rocket.active) {
+                        xpEarned *= state.emojiPowerUps.rocket.taskBonus;
+                    }
+                    
+                    awardXP(xpEarned);
+                    
+                    // Check for achievements
                     checkAchievement(1); // First Step
                     checkAchievement(5); // Task Crusher
-                    addNotification(`Task completed: ${task.title}`);
                 }
                 
                 saveState();
                 renderTasks();
+                updateStats();
+                
+                const task = state.tasks[taskIndex];
+                showToast(`Task "${task.title}" ${task.completed ? 'completed!' : 'marked as incomplete.'}`, 
+                         task.completed ? 'success' : 'info');
             }
         }
 
@@ -6136,7 +5967,7 @@
             }
         }
 
-        function deleteTask(taskId) {
+        function deleteTaskFromList(taskId) {
             if (confirm('Are you sure you want to delete this task?')) {
                 state.tasks = state.tasks.filter(t => t.id !== taskId);
                 saveState();
@@ -6145,66 +5976,347 @@
             }
         }
 
-        function loadNoteForEditing(noteId) {
+        function autoDeleteCompletedTasks() {
+            const completedTasks = state.tasks.filter(t => t.completed);
+            if (completedTasks.length === 0) {
+                showToast('No completed tasks to delete', 'info');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete ${completedTasks.length} completed task(s)?`)) {
+                state.tasks = state.tasks.filter(t => !t.completed);
+                saveState();
+                renderTasks();
+                showToast(`Deleted ${completedTasks.length} completed task(s)`);
+            }
+        }
+
+        function renderTimetable() {
+            timetableGrid.innerHTML = '';
+            
+            // Create time slots (8 AM to 5 PM)
+            const timeSlots = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            
+            // Add time column header
+            const timeHeader = document.createElement('div');
+            timeHeader.className = 'time-slot';
+            timeHeader.textContent = 'Time';
+            timetableGrid.appendChild(timeHeader);
+            
+            // Add day headers
+            days.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day-header';
+                dayHeader.textContent = day;
+                timetableGrid.appendChild(dayHeader);
+            });
+            
+            // Create timetable cells
+            timeSlots.forEach(time => {
+                // Time slot label
+                const timeLabel = document.createElement('div');
+                timeLabel.className = 'time-slot';
+                timeLabel.textContent = `${time}:00`;
+                timetableGrid.appendChild(timeLabel);
+                
+                // Cells for each day
+                for (let day = 1; day <= 7; day++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'timetable-cell';
+                    cell.setAttribute('data-day', day);
+                    cell.setAttribute('data-time', time);
+                    
+                    // Check if there's a class at this time
+                    const classAtTime = state.classes.find(c => c.day === day && c.time === time);
+                    if (classAtTime) {
+                        cell.classList.add('has-class');
+                        cell.style.borderLeftColor = classAtTime.color;
+                        cell.innerHTML = `
+                            <div class="class-subject">${classAtTime.subject}</div>
+                            <div class="class-topic">${classAtTime.topic || ''}</div>
+                        `;
+                        
+                        // Add click event to edit class
+                        cell.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            editClass(classAtTime.id);
+                        });
+                    } else {
+                        // Add click event to add class
+                        cell.addEventListener('click', () => {
+                            document.getElementById('class-modal-title').textContent = 'Add Class';
+                            document.getElementById('edit-class-id').value = '';
+                            document.getElementById('class-day').value = day;
+                            document.getElementById('class-time').value = time;
+                            classModal.classList.add('active');
+                        });
+                    }
+                    
+                    timetableGrid.appendChild(cell);
+                }
+            });
+        }
+
+        function editClass(classId) {
+            const classToEdit = state.classes.find(c => c.id === classId);
+            if (classToEdit) {
+                document.getElementById('class-modal-title').textContent = 'Edit Class';
+                document.getElementById('edit-class-id').value = classToEdit.id;
+                document.getElementById('class-subject').value = classToEdit.subject;
+                document.getElementById('class-topic').value = classToEdit.topic || '';
+                document.getElementById('class-color').value = classToEdit.color;
+                document.getElementById('class-day').value = classToEdit.day;
+                document.getElementById('class-time').value = classToEdit.time;
+                document.getElementById('delete-class-btn').style.display = 'block';
+                classModal.classList.add('active');
+            }
+        }
+
+        function renderTodaySchedule() {
+            todaySchedule.innerHTML = '';
+            
+            const today = new Date().getDay();
+            const currentDay = today === 0 ? 7 : today; // Convert to 1-7 (Mon-Sun)
+            const currentHour = new Date().getHours();
+            
+            const todaysClasses = state.classes.filter(c => c.day === currentDay)
+                                              .sort((a, b) => a.time - b.time);
+            
+            if (todaysClasses.length === 0) {
+                todaySchedule.innerHTML = '<p class="empty-state">No classes scheduled for today. Add some in the Timetable!</p>';
+                return;
+            }
+            
+            todaysClasses.forEach(cls => {
+                const classEl = document.createElement('div');
+                classEl.className = 'reminder-item';
+                const timeText = cls.time < 12 ? `${cls.time}:00 AM` : 
+                                cls.time === 12 ? '12:00 PM' : 
+                                `${cls.time - 12}:00 PM`;
+                
+                classEl.innerHTML = `
+                    <div class="reminder-header">
+                        <div class="reminder-title">
+                            <i class="fas fa-clock"></i>
+                            ${timeText}
+                        </div>
+                        ${cls.time > currentHour ? '<span class="upcoming">Upcoming</span>' : 
+                          cls.time === currentHour ? '<span class="now">Now</span>' : 
+                          '<span class="completed">Completed</span>'}
+                    </div>
+                    <div class="reminder-desc">
+                        <strong>${cls.subject}</strong>: ${cls.topic || 'No specific topic'}
+                    </div>
+                `;
+                
+                todaySchedule.appendChild(classEl);
+            });
+        }
+
+        function renderNotes() {
+            notesList.innerHTML = '';
+            
+            if (state.notes.length === 0) {
+                notesList.innerHTML = '<div class="empty-state">No notes yet. Create your first note!</div>';
+                return;
+            }
+            
+            // Sort notes by updated date (newest first)
+            const sortedNotes = [...state.notes].sort((a, b) => 
+                new Date(b.updatedAt) - new Date(a.updatedAt)
+            );
+            
+            sortedNotes.forEach(note => {
+                const noteItem = document.createElement('div');
+                noteItem.className = `note-item ${note.id === state.currentNoteId ? 'active' : ''}`;
+                noteItem.setAttribute('data-note-id', note.id);
+                
+                const updatedDate = new Date(note.updatedAt);
+                const dateText = updatedDate.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+                
+                // Create preview text (strip HTML tags)
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = note.content;
+                const previewText = tempDiv.textContent || tempDiv.innerText || '';
+                const shortPreview = previewText.length > 100 ? 
+                    previewText.substring(0, 100) + '...' : previewText;
+                
+                noteItem.innerHTML = `
+                    <div class="note-title">${note.title}</div>
+                    <div class="note-preview">${shortPreview}</div>
+                    <div class="note-date">Updated: ${dateText}</div>
+                `;
+                
+                noteItem.addEventListener('click', () => {
+                    loadNote(note.id);
+                });
+                
+                notesList.appendChild(noteItem);
+            });
+        }
+
+        function loadNote(noteId) {
             const note = state.notes.find(n => n.id === noteId);
             if (note) {
+                state.currentNoteId = note.id;
                 noteTitle.value = note.title;
                 quill.root.innerHTML = note.content;
-                state.currentNoteId = noteId;
                 
                 // Update active note in list
                 document.querySelectorAll('.note-item').forEach(item => {
-                    item.classList.remove('active');
+                    if (item.getAttribute('data-note-id') === noteId) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
                 });
-                document.querySelector(`[data-note-id="${noteId}"]`).classList.add('active');
                 
                 // Update read-only view if in view mode
                 if (state.notesViewMode === 'view') {
                     updateNotesReadonlyView();
                 }
                 
-                // Update mind map if in mind map mode
+                // Load mind map if in mind map mode
                 if (state.notesViewMode === 'mindmap') {
                     loadMindMap();
                 }
             }
         }
 
-        function editClassAtTime(day, time) {
-            const existingClass = state.classes.find(c => c.day === day && c.time === time);
+        function renderCalendar() {
+            calendarGrid.innerHTML = '';
             
-            if (existingClass) {
-                document.getElementById('class-modal-title').textContent = 'Edit Class';
-                document.getElementById('edit-class-id').value = existingClass.id;
-                document.getElementById('class-subject').value = existingClass.subject;
-                document.getElementById('class-topic').value = existingClass.topic;
-                document.getElementById('class-color').value = existingClass.color;
-                document.getElementById('class-day').value = existingClass.day;
-                document.getElementById('class-time').value = existingClass.time;
-                document.getElementById('delete-class-btn').style.display = 'block';
-            } else {
-                document.getElementById('class-modal-title').textContent = 'Add Class';
-                document.getElementById('edit-class-id').value = '';
-                document.getElementById('class-subject').value = '';
-                document.getElementById('class-topic').value = '';
-                document.getElementById('class-color').value = '#e94560';
-                document.getElementById('class-day').value = day;
-                document.getElementById('class-time').value = time;
-                document.getElementById('delete-class-btn').style.display = 'none';
+            // Day headers
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            days.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'calendar-day-header';
+                dayHeader.textContent = day;
+                calendarGrid.appendChild(dayHeader);
+            });
+            
+            // Get first day of month and total days
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            
+            // Add empty cells for days before the first day of the month
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'calendar-day empty';
+                calendarGrid.appendChild(emptyCell);
             }
             
-            classModal.classList.add('active');
+            // Add days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.className = 'calendar-day';
+                dayCell.innerHTML = `<div class="day-number">${day}</div>`;
+                
+                // Check for events on this day
+                const dateStr = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                const dayEvents = state.events.filter(e => e.date === dateStr);
+                
+                // Add events to the day cell
+                dayEvents.forEach(event => {
+                    const eventEl = document.createElement('div');
+                    eventEl.className = 'calendar-event';
+                    eventEl.textContent = event.title;
+                    eventEl.setAttribute('data-event-id', event.id);
+                    
+                    // Add click event to delete event
+                    eventEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (confirm(`Delete event "${event.title}"?`)) {
+                            deleteEventFromCalendar(event.id);
+                        }
+                    });
+                    
+                    dayCell.appendChild(eventEl);
+                });
+                
+                // Add click event to add event
+                dayCell.addEventListener('click', () => {
+                    document.getElementById('event-modal-title').textContent = 'Add Event';
+                    document.getElementById('edit-event-id').value = '';
+                    document.getElementById('event-date').value = dateStr;
+                    eventModal.classList.add('active');
+                });
+                
+                calendarGrid.appendChild(dayCell);
+            }
+            
+            // Update calendar header
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            document.querySelector('#calendar .widget-title').innerHTML = `
+                <i class="fas fa-calendar"></i>
+                ${monthNames[currentMonth]} ${currentYear}
+            `;
         }
 
-        function addEventOnDate(dateStr) {
-            document.getElementById('event-modal-title').textContent = 'Add Event';
-            document.getElementById('edit-event-id').value = '';
-            document.getElementById('event-title').value = '';
-            document.getElementById('event-description').value = '';
-            document.getElementById('event-date').value = dateStr;
-            document.getElementById('event-time').value = '';
-            document.getElementById('delete-event-btn').style.display = 'none';
-            eventModal.classList.add('active');
+        function deleteEventFromCalendar(eventId) {
+            state.events = state.events.filter(e => e.id !== eventId);
+            saveState();
+            renderCalendar();
+            showToast('Event deleted successfully!');
+        }
+
+        function renderSubjects() {
+            subjectsGrid.innerHTML = '';
+            
+            if (state.subjects.length === 0) {
+                subjectsGrid.innerHTML = '<div class="empty-state">No subjects added yet. Add your first subject!</div>';
+                return;
+            }
+            
+            state.subjects.forEach(subject => {
+                const subjectCard = document.createElement('div');
+                subjectCard.className = 'widget';
+                subjectCard.style.borderLeft = `4px solid ${subject.color}`;
+                
+                subjectCard.innerHTML = `
+                    <div class="widget-header">
+                        <h2 class="widget-title">
+                            <i class="fas fa-book" style="color: ${subject.color}"></i>
+                            ${subject.name}
+                        </h2>
+                        <button class="btn btn-secondary edit-subject" data-subject-id="${subject.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                    <div class="widget-content">
+                        ${subject.resources.length > 0 ? 
+                            `<p><strong>Resources (${subject.resources.length}):</strong></p>
+                             <ul style="font-size: 14px; margin-left: 20px;">
+                                ${subject.resources.map(r => `<li>${r}</li>`).join('')} 
+                             </ul>` : 
+                            '<p class="empty-state">No resources added for this subject.</p>'}
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-primary add-resource-to-subject" data-subject-id="${subject.id}">
+                                <i class="fas fa-plus"></i> Add Resource
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Add event listeners
+                subjectCard.querySelector('.edit-subject').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    editSubject(subject.id);
+                });
+                
+                subjectCard.querySelector('.add-resource-to-subject').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    addResourceToSubject(subject.id);
+                });
+                
+                subjectsGrid.appendChild(subjectCard);
+            });
         }
 
         function editSubject(subjectId) {
@@ -6218,6 +6330,92 @@
                 document.getElementById('delete-subject-btn').style.display = 'block';
                 subjectModal.classList.add('active');
             }
+        }
+
+        function addResourceToSubject(subjectId) {
+            const subject = state.subjects.find(s => s.id === subjectId);
+            if (subject) {
+                const resourceUrl = prompt('Enter resource URL:');
+                if (resourceUrl) {
+                    const resourceName = prompt('Enter resource name (optional):') || 'New Resource';
+                    subject.resources.push(`${resourceName}: ${resourceUrl}`);
+                    saveState();
+                    renderSubjects();
+                    showToast('Resource added to subject!');
+                }
+            }
+        }
+
+        function renderResources() {
+            resourcesContainer.innerHTML = '';
+            
+            if (state.resources.length === 0) {
+                resourcesContainer.innerHTML = '<div class="empty-state">No resources added yet. Add your first resource!</div>';
+                return;
+            }
+            
+            // Group resources by category
+            const categories = {
+                pdf: { name: 'PDF Documents', icon: 'fa-file-pdf' },
+                video: { name: 'Videos', icon: 'fa-video' },
+                website: { name: 'Websites', icon: 'fa-globe' },
+                book: { name: 'Books', icon: 'fa-book' },
+                article: { name: 'Articles', icon: 'fa-newspaper' },
+                other: { name: 'Other', icon: 'fa-link' }
+            };
+            
+            Object.entries(categories).forEach(([categoryKey, categoryInfo]) => {
+                const categoryResources = state.resources.filter(r => r.category === categoryKey);
+                if (categoryResources.length > 0) {
+                    const categorySection = document.createElement('div');
+                    categorySection.className = 'resource-category';
+                    
+                    categorySection.innerHTML = `
+                        <h3><i class="fas ${categoryInfo.icon}"></i> ${categoryInfo.name} (${categoryResources.length})</h3>
+                    `;
+                    
+                    categoryResources.forEach(resource => {
+                        const resourceItem = document.createElement('div');
+                        resourceItem.className = 'resource-item';
+                        
+                        resourceItem.innerHTML = `
+                            <div class="resource-icon">
+                                <i class="fas ${categoryInfo.icon}"></i>
+                            </div>
+                            <div class="resource-info">
+                                <div class="resource-name">${resource.name}</div>
+                                <div class="resource-desc">${resource.description || 'No description'}</div>
+                                <a href="${resource.url}" target="_blank" style="font-size: 12px; color: var(--accent);">${resource.url}</a>
+                            </div>
+                            <div class="resource-actions">
+                                <button class="btn btn-secondary edit-resource" data-resource-id="${resource.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-secondary delete-resource" data-resource-id="${resource.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        `;
+                        
+                        // Add event listeners
+                        resourceItem.querySelector('.edit-resource').addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            editResource(resource.id);
+                        });
+                        
+                        resourceItem.querySelector('.delete-resource').addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (confirm(`Delete resource "${resource.name}"?`)) {
+                                deleteResourceFromList(resource.id);
+                            }
+                        });
+                        
+                        categorySection.appendChild(resourceItem);
+                    });
+                    
+                    resourcesContainer.appendChild(categorySection);
+                }
+            });
         }
 
         function editResource(resourceId) {
@@ -6234,69 +6432,241 @@
             }
         }
 
-        function autoDeleteCompletedTasks() {
-            const completedTasks = state.tasks.filter(t => t.completed);
+        function deleteResourceFromList(resourceId) {
+            if (confirm('Are you sure you want to delete this resource?')) {
+                state.resources = state.resources.filter(r => r.id !== resourceId);
+                saveState();
+                renderResources();
+                showToast('Resource deleted successfully!');
+            }
+        }
+
+        function renderAchievements() {
+            achievementsGrid.innerHTML = '';
             
-            if (completedTasks.length === 0) {
-                showToast('No completed tasks to delete', 'info');
+            state.achievements.forEach(achievement => {
+                const achievementCard = document.createElement('div');
+                achievementCard.className = `achievement-card ${achievement.unlocked ? 'unlocked' : 'locked'}`;
+                
+                achievementCard.innerHTML = `
+                    <div class="achievement-icon">
+                        <i class="fas ${achievement.icon}"></i>
+                    </div>
+                    <div class="achievement-name">${achievement.name}</div>
+                    <div class="achievement-desc">${achievement.description}</div>
+                    ${!achievement.unlocked ? 
+                        `<div class="progress-container" style="margin-top: 10px;">
+                            <div class="progress-label">
+                                <span>${achievement.progress}/${achievement.target}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${(achievement.progress / achievement.target) * 100}%"></div>
+                            </div>
+                        </div>` : 
+                        '<div style="color: var(--success); font-size: 12px; margin-top: 5px;">✓ Unlocked!</div>'}
+                `;
+                
+                achievementsGrid.appendChild(achievementCard);
+            });
+        }
+
+        // Helper functions
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function updateTaskSubjectSelect() {
+            taskSubjectSelect.innerHTML = '<option value="">No Subject</option>';
+            state.subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject.name;
+                option.textContent = subject.name;
+                taskSubjectSelect.appendChild(option);
+            });
+        }
+
+        function updateStats() {
+            xpCount.textContent = state.xp;
+            streakCount.textContent = state.streak;
+            levelCount.textContent = state.level;
+            userLevel.textContent = state.level;
+            
+            // Calculate XP progress to next level
+            const xpForNextLevel = state.level * 500;
+            const xpProgress = Math.min((state.xp % 500) / 500 * 100, 100);
+            xpProgressText.textContent = `${state.xp % 500}/500`;
+            xpProgressBar.style.width = `${xpProgress}%`;
+        }
+
+        function updateSessionsProgress() {
+            sessionsCount.textContent = state.timerSessions;
+            const progress = Math.min((state.timerSessions / 5) * 100, 100);
+            sessionsProgress.style.width = `${progress}%`;
+        }
+
+        function updateNotifications() {
+            notificationList.innerHTML = '';
+            
+            // Generate notifications based on achievements unlocked
+            const unlockedAchievements = state.achievements.filter(a => a.unlocked);
+            
+            if (unlockedAchievements.length === 0) {
+                notificationList.innerHTML = '<div class="empty-state">No notifications yet. Complete tasks to earn achievements!</div>';
                 return;
             }
             
-            if (confirm(`Are you sure you want to delete ${completedTasks.length} completed task(s)?`)) {
-                state.tasks = state.tasks.filter(t => !t.completed);
+            // Show only recent achievements (last 5)
+            const recentAchievements = unlockedAchievements.slice(-5).reverse();
+            
+            recentAchievements.forEach(achievement => {
+                const notification = document.createElement('div');
+                notification.className = 'notification-item';
+                notification.innerHTML = `
+                    <div class="notification-icon">
+                        <i class="fas ${achievement.icon}"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title">Achievement Unlocked!</div>
+                        <div class="notification-desc">${achievement.name}: ${achievement.description}</div>
+                    </div>
+                `;
+                notificationList.appendChild(notification);
+            });
+        }
+
+        function checkStreak() {
+            const today = new Date().toDateString();
+            const lastStudy = state.lastStudyDate ? new Date(state.lastStudyDate).toDateString() : null;
+            
+            if (lastStudy !== today) {
+                // Check if last study was yesterday
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = yesterday.toDateString();
+                
+                if (lastStudy === yesterdayStr) {
+                    state.streak++;
+                } else if (lastStudy !== today) {
+                    // Reset streak if not consecutive
+                    state.streak = 1;
+                }
+                
+                state.lastStudyDate = new Date().toISOString();
                 saveState();
-                renderTasks();
-                showToast(`Deleted ${completedTasks.length} completed task(s)`);
+                updateStats();
             }
         }
 
-        function showToast(message, type = 'info') {
-            // Create toast element
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.textContent = message;
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: ${type === 'error' ? '#e94560' : type === 'success' ? '#4cd97b' : '#0f3460'};
-                color: white;
-                padding: 12px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                z-index: 10000;
-                max-width: 300px;
-                animation: slideIn 0.3s ease;
-            `;
+        function updateStreak() {
+            const today = new Date().toDateString();
+            const lastStudy = state.lastStudyDate ? new Date(state.lastStudyDate).toDateString() : null;
             
-            document.body.appendChild(toast);
+            if (lastStudy !== today) {
+                // Check if last study was yesterday
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = yesterday.toDateString();
+                
+                if (lastStudy === yesterdayStr) {
+                    state.streak++;
+                } else if (lastStudy !== today) {
+                    // Start new streak if it's been more than a day
+                    state.streak = 1;
+                }
+                
+                state.lastStudyDate = new Date().toISOString();
+                saveState();
+                updateStats();
+                
+                // Check for consistency achievement
+                checkAchievement(3); // Consistency is Key
+            }
+        }
+
+        function awardXP(amount) {
+            state.xp += amount;
             
-            // Remove toast after 3 seconds
-            setTimeout(() => {
-                toast.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => {
-                    document.body.removeChild(toast);
-                }, 300);
-            }, 3000);
+            // Check for level up
+            const newLevel = Math.floor(state.xp / 500) + 1;
+            if (newLevel > state.level) {
+                state.level = newLevel;
+                showToast(`🎉 Level Up! You are now Level ${state.level}!`, 'success');
+                
+                // Check for subject master achievement based on level
+                if (state.level >= 5) {
+                    checkAchievement(4); // Subject Master
+                }
+            }
+            
+            // Update achievements progress
+            state.achievements.forEach(achievement => {
+                if (!achievement.unlocked) {
+                    // Update progress for task-based achievements
+                    if (achievement.id === 1 || achievement.id === 5) {
+                        achievement.progress = state.tasks.filter(t => t.completed).length;
+                    }
+                    // Update progress for session-based achievements
+                    else if (achievement.id === 2) {
+                        achievement.progress = state.timerSessions;
+                    }
+                    // Update progress for streak-based achievements
+                    else if (achievement.id === 3) {
+                        achievement.progress = state.streak;
+                    }
+                    
+                    // Check if achievement is unlocked
+                    if (achievement.progress >= achievement.target) {
+                        achievement.unlocked = true;
+                        showToast(`🏆 Achievement Unlocked: ${achievement.name}!`, 'success');
+                        updateNotifications();
+                    }
+                }
+            });
+            
+            saveState();
+            updateStats();
+        }
+
+        function checkAchievement(achievementId) {
+            const achievement = state.achievements.find(a => a.id === achievementId);
+            if (achievement && !achievement.unlocked) {
+                achievement.progress = Math.min(achievement.progress + 1, achievement.target);
+                
+                if (achievement.progress >= achievement.target) {
+                    achievement.unlocked = true;
+                    showToast(`🏆 Achievement Unlocked: ${achievement.name}!`, 'success');
+                    updateNotifications();
+                }
+                
+                saveState();
+                renderAchievements();
+            }
         }
 
         function setupCharts() {
-            // Weekly XP Chart
+            // Weekly progress chart
             const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
             new Chart(weeklyCtx, {
-                type: 'bar',
+                type: 'line',
                 data: {
                     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                     datasets: [{
-                        label: 'XP Earned',
-                        data: [120, 190, 300, 150, 200, 180, 250],
-                        backgroundColor: 'rgba(233, 69, 96, 0.7)',
-                        borderColor: 'rgba(233, 69, 96, 1)',
-                        borderWidth: 1
+                        label: 'Study Time (hours)',
+                        data: [2, 3, 1.5, 4, 2.5, 1, 0],
+                        borderColor: '#e94560',
+                        backgroundColor: 'rgba(233, 69, 96, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
                     }]
                 },
                 options: {
                     responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -6315,38 +6685,32 @@
                                 color: 'var(--text-light)'
                             }
                         }
-                    },
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: 'var(--text-light)'
-                            }
-                        }
                     }
                 }
             });
-
-            // Subject Chart
+            
+            // Subject chart
             const subjectCtx = document.getElementById('subjectChart').getContext('2d');
             new Chart(subjectCtx, {
-                type: 'doughnut',
+                type: 'bar',
                 data: {
-                    labels: ['Math', 'Science', 'History', 'Language', 'Art'],
+                    labels: ['Math', 'Science', 'History', 'English', 'Art'],
                     datasets: [{
-                        data: [30, 25, 20, 15, 10],
+                        label: 'Hours Studied',
+                        data: [12, 8, 6, 10, 4],
                         backgroundColor: [
-                            'rgba(233, 69, 96, 0.7)',
-                            'rgba(76, 217, 123, 0.7)',
-                            'rgba(255, 193, 7, 0.7)',
-                            'rgba(23, 162, 184, 0.7)',
-                            'rgba(153, 102, 255, 0.7)'
+                            'rgba(233, 69, 96, 0.8)',
+                            'rgba(76, 217, 123, 0.8)',
+                            'rgba(23, 162, 184, 0.8)',
+                            'rgba(255, 193, 7, 0.8)',
+                            'rgba(108, 92, 231, 0.8)'
                         ],
                         borderColor: [
                             'rgba(233, 69, 96, 1)',
                             'rgba(76, 217, 123, 1)',
-                            'rgba(255, 193, 7, 1)',
                             'rgba(23, 162, 184, 1)',
-                            'rgba(153, 102, 255, 1)'
+                            'rgba(255, 193, 7, 1)',
+                            'rgba(108, 92, 231, 1)'
                         ],
                         borderWidth: 1
                     }]
@@ -6355,33 +6719,9 @@
                     responsive: true,
                     plugins: {
                         legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: 'var(--text-light)'
-                            }
+                            display: false
                         }
-                    }
-                }
-            });
-
-            // Weekly Trend Chart
-            const weeklyTrendCtx = document.getElementById('weeklyTrendChart').getContext('2d');
-            new Chart(weeklyTrendCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                    datasets: [{
-                        label: 'Study Hours',
-                        data: [12, 15, 18, 20],
-                        backgroundColor: 'rgba(233, 69, 96, 0.2)',
-                        borderColor: 'rgba(233, 69, 96, 1)',
-                        borderWidth: 2,
-                        tension: 0.3,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -6400,16 +6740,77 @@
                                 color: 'var(--text-light)'
                             }
                         }
-                    },
+                    }
+                }
+            });
+            
+            // Weekly trend chart
+            const trendCtx = document.getElementById('weeklyTrendChart').getContext('2d');
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [{
+                        label: 'Productivity Score',
+                        data: [65, 75, 80, 90],
+                        borderColor: '#4cd97b',
+                        backgroundColor: 'rgba(76, 217, 123, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
                     plugins: {
                         legend: {
-                            labels: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'var(--text-light)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
                                 color: 'var(--text-light)'
                             }
                         }
                     }
                 }
             });
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast';
+            
+            if (type === 'success') {
+                toast.classList.add('toast-success');
+            } else if (type === 'error') {
+                toast.classList.add('toast-error');
+            }
+            
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                    toast.style.animation = '';
+                }, 300);
+            }, 3000);
         }
 
         // Initialize the application
@@ -6417,4 +6818,3 @@
     </script>
 </body>
 </html>
-
